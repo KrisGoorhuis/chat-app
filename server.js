@@ -22,38 +22,42 @@ app.get('/', (request, response) => {
 });
 
 wss.on('connection', function connection(ws, request) {
+	if (wss.clients.size > 1) {
+		client.send("rename");
+	}
 	ws.on('message', function message(message) {
+		message = JSON.parse(message);
 		console.log("Message: ");
-		console.log(message);
-
+		console.log((message));
+		
 		wss.clients.forEach(function each(client) {
 			if ( client.readyState === WebSocket.OPEN) {
-			  client.send(message);
-			  console.log(message)
+			  	client.send(JSON.stringify(message));
+				
 			}
 		});
 		saveChatMessage(message);
 	})
 })
 
-function saveChatMessage(request) {
+function saveChatMessage(message) {
 	MongoClient.connect(mongoAddress, (error, client) => {
 		if (error) {
 			console.log(error);
 		}
 		let db = client.db("chat");
-
-		request = JSON.parse(request.data);
+		
+		message = message;
 		db.collection("messages").insert(
 			{
-				"conversationId": request.conversationId,
-				"author": request.author,
-				"timestamp": request.timestamp,
-				"message": request.message
+				"conversationId": message.conversationId,
+				"author": message.author,
+				"timestamp": message.timestamp,
+				"message": message.message
 			}
 		
 		);
-		console.log(request);
+		console.log("saving");
 	})
 }
 

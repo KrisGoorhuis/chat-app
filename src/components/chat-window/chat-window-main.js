@@ -45,7 +45,7 @@ export class ChatWindow extends React.Component {
             
             <div id="container-chat" className="">
                 <ChatLog currentChatWindow={this.currentChatWindow} switchChatWindows={this.switchChatWindows} ws={ws} />
-                <ChatInput currentUser={this.props.currentUser} currentChatWindow={this.state.currentChatWindow} ws={ws} />
+                <ChatInput currentUser={this.props.currentUser} currentChatWindow={this.state.currentChatWindow} rename={this.rename} ws={ws} />
             </div>
             
         )

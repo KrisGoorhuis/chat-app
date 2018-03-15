@@ -21,9 +21,12 @@ export class App extends React.Component {
         this.state = {
            
         }
-
+        this.rename.bind(this);
     }
         
+    rename(newName) {
+        this.currentUser = newName;
+    }
 
     render() {
         return (
@@ -31,8 +34,8 @@ export class App extends React.Component {
                 <Header />
                 <div id="container-main-content" className="container-fluid">
                     <div>{this.datathing}</div>
-                    <SideBar currentUser={this.currentUser} />
-                    <ChatWindow currentUser={this.currentUser} />
+                    <SideBar currentUser={this.currentUser} rename={this.rename} />
+                    <ChatWindow currentUser={this.currentUser} rename={this.rename} />
                 </div>
             </div>
         )
