@@ -1,0 +1,80 @@
+
+ 
+$bootstrap-sass-asset-helper: true; /* Solution I don't understand from https://github.com/webpack-contrib/sass-loader/issues/40 */
+@import "~bootstrap-sass/assets/stylesheets/_bootstrap.scss"; // Tilde (~) points it toward the node_modules folder
+@import url('https://fonts.googleapis.com/css?family=Poppins|Lato|Oswald');
+$fa-font-path: "~font-awesome/fonts";
+@import '~font-awesome/scss/font-awesome.scss';
+
+
+#container-header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#container-main-content {
+    padding: 0px;
+    display: flex;
+}
+
+#container-sidebar {
+    min-width: 200px;
+    background-color: rgba(250, 250, 250, 1);
+    margin: 0px;
+    padding: 0px;
+    max-height: 600px;
+
+    #this-user {
+        padding: 10px 0 0 15px;
+        color: rgba(150, 150, 150, 1);
+    }
+
+    h4 {
+        margin: 0px;
+        padding: 15px;
+        padding-bottom: 5px;
+        padding-left: 5px;
+    }
+
+    .user-name {
+        
+        
+    }
+
+    #container-sidebar-all-users-list {
+
+        #all-users-list {
+            max-height: 300px;
+            padding-left: 15px;
+            overflow: scroll;
+            overflow-x: hidden;
+        }
+    }
+
+    #container-sidebar-private-conversations {
+        
+        #private-conversations-list { 
+            min-height: 30px;    
+            max-height: 200px;
+            padding-left: 15px;
+            overflow: scroll;
+            overflow-x: hidden;
+        }
+    } 
+}
+
+
+#container-chat {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    #chat-log {
+        padding: 10px;
+    }
+    #chat-input {
+        margin-left: 10px;
+    }
+}
+
