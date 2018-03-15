@@ -6,7 +6,7 @@ import {ChatLog} from './chat-log.js';
 import {ChatInput} from './chat-input.js';
 
 //const WebSocket = require('ws');
-let ws = new WebSocket('ws://localhost:3000');
+let ws = new WebSocket('ws://' + process.env.PORT || 'ws://localhost:3000');
 
 ws.onopen = () => {
    // ws.send("testing websockets!");
