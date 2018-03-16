@@ -11,11 +11,13 @@ export class ChatLog extends React.Component {
         this.ws.onmessage = (message) => {
            console.log((message.data));
            console.log((message.data));
-           if (JSON.stringify(message.data) === "HonestMoose") {
+           if (JSON.stringify(message.data) == "HonestMoose") {
             this.props.rename("HonestMoose");
+            console.log("sending rename request")
             console.log(JSON.stringify(message.data))
-          } else if (JSON.stringify(message.data) === "UnsuspectingCass") {
+          } else if (JSON.stringify(message.data) == "UnsuspectingCass") {
                 this.props.rename("UnsuspectingCass");
+                console.log("sending rename request")
                 console.log(JSON.stringify(message.data));
             } else {
                 let newMessages = this.state.messages;
