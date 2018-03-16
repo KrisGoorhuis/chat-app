@@ -31,7 +31,9 @@ export class ChatWindow extends React.Component {
         }
 
         this.switchChatWindows = this.switchChatWindows.bind(this);
-        this.currentUser = "HonestMoose";
+        this.state = {
+            userName: "HonestMoose"
+        }
         this.rename.bind(this);
     }
 
@@ -41,7 +43,9 @@ export class ChatWindow extends React.Component {
     }
 
     rename(newName) {
-        this.currentUser = newName;
+        setState({
+            currentUser: newName
+        })
         console.log("renaming!");
     }
 
@@ -51,7 +55,7 @@ export class ChatWindow extends React.Component {
             
             <div id="container-chat" className="">
                 <ChatLog currentChatWindow={this.currentChatWindow} switchChatWindows={this.switchChatWindows} rename={this.rename} ws={ws} />
-                <ChatInput currentUser={this.currentUser} currentChatWindow={this.state.currentChatWindow} rename={this.rename} ws={ws} />
+                <ChatInput currentUser={this.state.currentUser} currentChatWindow={this.state.currentChatWindow} rename={this.rename} ws={ws} />
             </div>
             
         )
