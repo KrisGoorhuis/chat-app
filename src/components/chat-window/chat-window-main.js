@@ -31,6 +31,7 @@ export class ChatWindow extends React.Component {
         }
 
         this.switchChatWindows = this.switchChatWindows.bind(this);
+        this.currentUser = "HonestMoose";
         this.rename.bind(this);
     }
 
