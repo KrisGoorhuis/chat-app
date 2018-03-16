@@ -16,6 +16,7 @@ export class ChatInput extends React.Component {
         let sendingPublicMessage = true;
         
         if (this.props.currentChatWindow === "public") {
+            console.log("Submitting chat message");
             this.ws.send(JSON.stringify(
                     {
                         "conversationId": "public",
