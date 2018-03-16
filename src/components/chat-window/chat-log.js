@@ -13,8 +13,10 @@ export class ChatLog extends React.Component {
            console.log((message.data));
            if (JSON.stringify(message.data) === "HonestMoose") {
             this.props.rename("HonestMoose");
+            console.log(JSON.stringify(message.data))
           } else if (JSON.stringify(message.data) === "UnsuspectingCass") {
                 this.props.rename("UnsuspectingCass");
+                console.log(JSON.stringify(message.data));
             } else {
                 let newMessages = this.state.messages;
                 newMessages.push(JSON.parse(message.data))
