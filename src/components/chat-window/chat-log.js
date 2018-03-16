@@ -9,11 +9,11 @@ export class ChatLog extends React.Component {
         this.ws = this.props.ws;
         
         this.ws.onmessage = (message) => {
-           console.log(JSON.parse(message.data));
-           console.log(typeof(JSON.parse(message.data)));
+           console.log((message.data));
+           console.log((message.data));
            if (JSON.stringify(message.data) === "HonestMoose") {
             this.props.rename("HonestMoose");
-        } else if (JSON.stringify(message.data) === "UnsuspectingCass") {
+          } else if (JSON.stringify(message.data) === "UnsuspectingCass") {
                 this.props.rename("UnsuspectingCass");
             } else {
                 let newMessages = this.state.messages;

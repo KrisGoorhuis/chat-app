@@ -28,6 +28,7 @@ wss.on('connection', function connection(ws, request) {
 	if (wss.clients.size > 1 ) {
 		ws.send("UnsuspectingCass"); 
 	}
+	console.log(wss.clients.size);
 	ws.on('message', function message(message) {
 		message = JSON.parse(message);
 		console.log("Message: ");
