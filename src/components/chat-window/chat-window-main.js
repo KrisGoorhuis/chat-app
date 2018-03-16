@@ -31,12 +31,17 @@ export class ChatWindow extends React.Component {
         }
 
         this.switchChatWindows = this.switchChatWindows.bind(this);
-        
+        this.rename.bind(this);
     }
 
     
     switchChatWindows() {
         // Tabs at the top
+    }
+
+    rename(newName) {
+        this.currentUser = newName;
+        console.log("renaming!");
     }
 
     render() {
@@ -45,7 +50,7 @@ export class ChatWindow extends React.Component {
             
             <div id="container-chat" className="">
                 <ChatLog currentChatWindow={this.currentChatWindow} switchChatWindows={this.switchChatWindows} rename={this.props.rename} ws={ws} />
-                <ChatInput currentUser={this.props.currentUser} currentChatWindow={this.state.currentChatWindow} rename={this.props.rename} ws={ws} />
+                <ChatInput currentUser={this.currentUser} currentChatWindow={this.state.currentChatWindow} rename={this.props.rename} ws={ws} />
             </div>
             
         )
