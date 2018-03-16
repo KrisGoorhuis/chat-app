@@ -26,12 +26,10 @@ export class ChatWindow extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            currentChatWindow: "public"
-        }
 
         this.switchChatWindows = this.switchChatWindows.bind(this);
         this.state = {
+            currentChatWindow: "public",
             userName: "HonestMoose"
         }
         this.rename = this.rename.bind(this);
