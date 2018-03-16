@@ -16,7 +16,7 @@ export class App extends React.Component {
             // Pull private conversations if cookie thing exists (user sessions?)
             // Otherwise assign user name
                 // If word combination existed previously, add an icrementing number until successful
-        this.currentUser = "HonestMoose";
+        this.currentUser = "UnsuspectingCass";
         
         this.state = {
            

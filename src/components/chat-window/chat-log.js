@@ -11,8 +11,8 @@ export class ChatLog extends React.Component {
         this.ws.onmessage = (message) => {
            console.log(JSON.parse(message.data));
            console.log(typeof(JSON.parse(message.data)));
-            if (message.data === "rename") {
-                this.props.rename("SkepticalCass");
+            if (JSON.stringify(message.data) === "rename") {
+                this.props.rename("UnsuspectingCass");
             } else {
                 let newMessages = this.state.messages;
                 newMessages.push(JSON.parse(message.data))
