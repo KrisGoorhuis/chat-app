@@ -34,7 +34,7 @@ export class ChatWindow extends React.Component {
         this.state = {
             userName: "HonestMoose"
         }
-        this.rename.bind(this);
+        this.rename = this.rename.bind(this);
     }
 
     
@@ -44,7 +44,7 @@ export class ChatWindow extends React.Component {
 
     rename(newName) {
         this.setState({
-            currentUser: newName
+            "currentUser": newName
         })
         console.log("renaming!");
     }
