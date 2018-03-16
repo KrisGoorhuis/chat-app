@@ -26,6 +26,7 @@ export class App extends React.Component {
         
     rename(newName) {
         this.currentUser = newName;
+        console.log("renaming!");
     }
 
     render() {
