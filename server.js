@@ -23,7 +23,7 @@ app.get('/', (request, response) => {
 
 wss.on('connection', function connection(ws, request) {
 	if (wss.clients.size > 1) {
-		wss.send("rename");
+		ws.send("rename"); //wss.send is not a message
 	}
 	ws.on('message', function message(message) {
 		message = JSON.parse(message);
