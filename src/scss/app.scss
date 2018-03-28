@@ -6,6 +6,7 @@ $bootstrap-sass-asset-helper: true; /* Solution I don't understand from https://
 $fa-font-path: "~font-awesome/fonts";
 @import '~font-awesome/scss/font-awesome.scss';
 
+$app-height: 600px;
 
 #container-header {
     padding-top: 10px;
@@ -15,6 +16,7 @@ $fa-font-path: "~font-awesome/fonts";
 #container-main-content {
     padding: 0px;
     display: flex;
+    max-height: $app-height;
 }
 
 #container-sidebar {
@@ -22,40 +24,43 @@ $fa-font-path: "~font-awesome/fonts";
     background-color: rgba(250, 250, 250, 1);
     margin: 0px;
     padding: 0px;
-    max-height: 600px;
+    max-height: $app-height;
+    display: flex;
+    flex-direction: column;
 
+    $this-user-height: 30px;
     #this-user {
         padding: 10px 0 0 15px;
         color: rgba(150, 150, 150, 1);
+        height: $this-user-height;
     }
 
+    $h4-height: 40px;
     h4 {
         margin: 0px;
         padding: 15px;
         padding-bottom: 5px;
         padding-left: 5px;
+        height: $h4-height;
     }
 
-    .user-name {
-        
-        
-    }
 
+    $all-users-height: 300px;
     #container-sidebar-all-users-list {
-
+        max-height: $all-users-height;
         #all-users-list {
-            max-height: 300px;
+            max-height: $all-users-height - $h4-height; 
+            overflow-y: scroll;
+            //overflow-x: hidden;
             padding-left: 15px;
-            overflow: scroll;
-            overflow-x: hidden;
         }
     }
 
+    $private-conversations-height: 250px;
     #container-sidebar-private-conversations {
-        
+        height: $private-conversations-height;
         #private-conversations-list { 
-            min-height: 30px;    
-            max-height: 200px;
+            height: $app-height - $all-users-height - $h4-height*2;
             padding-left: 15px;
             overflow: scroll;
             overflow-x: hidden;
@@ -69,12 +74,20 @@ $fa-font-path: "~font-awesome/fonts";
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    max-height: 100%;
 
     #chat-log {
         padding: 10px;
+    	overflow-y: scroll;
+	    overflow-x: hidden;
+    }
+
+    form {
+        width: 90%;
     }
     #chat-input {
         margin-left: 10px;
+        width: 100%;
     }
 }
 

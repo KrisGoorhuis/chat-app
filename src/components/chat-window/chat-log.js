@@ -9,24 +9,12 @@ export class ChatLog extends React.Component {
         this.ws = this.props.ws;
         
         this.ws.onmessage = (message) => {
-           if ((message.data) == "HonestMoose") {
-            this.props.rename("HonestMoose");
-            console.log("sending rename request")
-            console.log(JSON.stringify(message.data))
-          } else if ((message.data) == "UnsuspectingCass") {
-                console.log(JSON.stringify(message.data))
-                this.props.rename("UnsuspectingCass");
-                console.log("sending rename request")
-                console.log(JSON.stringify(message.data));
-            } else {
-                let newMessages = this.state.messages;
-                newMessages.push(JSON.parse(message.data))
-                 this.setState({
-                    messages: newMessages
-                 })
-
-            }
-
+          
+            let newMessages = this.state.messages;
+            // newMessages.push(JSON.parse(message.data))
+            this.setState({
+                messages: newMessages
+            })
         }
 
         let xhr = new XMLHttpRequest();
@@ -66,11 +54,16 @@ export class ChatLog extends React.Component {
 
     }
 
+    componentDidMount() {
+        let chatLog = this.chatLog;
+        chatLog.scrollTop = chatLog.scrollHeight;
+    } 
+
     render() {
         const {messagesLoaded, messages} = this.state;
 
         return (
-            <div id="chat-log">
+            <div id="chat-log" ref={input => this.chatLog = input}>
                 {
                     !messagesLoaded &&
                     <div>Fetching messages...</div>

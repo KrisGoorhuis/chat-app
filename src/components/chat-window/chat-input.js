@@ -60,7 +60,7 @@ export class ChatInput extends React.Component {
 
         return (
             <form onSubmit={ (element) => this.submitMessage(element) }>
-                <input id="chat-input" placeholder={this.props.currentUser + " says..."} ref={ (element) => { this.chatInputElement = element } }></input>
+                <input id="chat-input" autoComplete="off" placeholder={this.props.currentUser + " says..."} ref={ (element) => { this.chatInputElement = element } }></input>
             </form>
         )
     }
