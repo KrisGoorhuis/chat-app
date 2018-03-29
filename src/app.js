@@ -5,9 +5,6 @@ import {Header} from './components/header.js';
 import {SideBar} from './components/sidebar/sidebar-main.js';
 import {ChatWindow} from './components/chat-window/chat-window-main.js'
 
-//const WebSocket = require('ws');
-let HOST = location.origin.replace(/^http/, 'ws')
-
 
 export class App extends React.Component {
 
@@ -19,7 +16,7 @@ export class App extends React.Component {
             // Otherwise assign user name
                 // If word combination existed previously, add an icrementing number until successful
 
-        this.ws = new WebSocket(HOST || 'ws://localhost:3000');
+        this.ws = new WebSocket( location.origin.replace(/^http/, 'ws') || 'ws://localhost:3000' );
         
 
         if (localStorage.getItem("userName")) {
@@ -30,7 +27,9 @@ export class App extends React.Component {
             this.state = {
                 currentUser: "( Generating... )"
             }
+            
             this.ws.onopen = () => {
+                console.log("sending request");
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = () => {
                     if ( xhr.readyState == 4 && xhr.status == 200 )  {
@@ -57,12 +56,6 @@ export class App extends React.Component {
                 xhr.setRequestHeader("Content-Type", "application/json");
                 xhr.send();
             }      
-        }
-
-
-        this.ws.onopen = () => {
-            // ws.send("testing websockets!");
-            
         }
         
         this.rename = this.rename.bind(this);   
