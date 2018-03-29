@@ -48,11 +48,10 @@ wss.on('connection', function connection(ws, request) {
 	console.log("client connect at " + new Date());
 	console.log("Number of clients: " + wss.clients.size);
 	ws.on('message', function message(message) {
-		message = JSON.parse(message);
-
-		if (message = "ping") { 
+		if (message === "ping") { 
 			// stay open!
 		} else {
+			message = JSON.parse(message);
 			console.log("Message: ");
 			console.log((message));
 			

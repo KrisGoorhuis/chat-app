@@ -17,50 +17,60 @@ export class App extends React.Component {
                 // If word combination existed previously, add an icrementing number until successful
 
         this.ws = new WebSocket( location.origin.replace(/^http/, 'ws') || 'ws://localhost:3000' );
-        
-        function keepWebSocketOpen() {
-            setTimeout(keepWebSocketOpen, 5000);
-        };
-        keepWebSocketOpen();
 
         if (localStorage.getItem("userName")) {
             this.state = {
                 currentUser: localStorage.getItem("userName")
             }
-        } else {
+        }
+
+        function keepWebSocketOpen(ws) {
+            ws.send("ping");
+            setTimeout(function() {
+                keepWebSocketOpen(ws);
+            }, 5000);
+        };
+
+        this.ws.onopen = () => {
+            keepWebSocketOpen(this.ws);
+            
+            if (!localStorage.getItem("userName")) {
             this.state = {
                 currentUser: "( Generating... )"
             }
             
-            this.ws.onopen = () => {
-                console.log("sending request");
-                let xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = () => {
-                    if ( xhr.readyState == 4 && xhr.status == 200 )  {
-                        let newUserName = xhr.responseText;
+            console.log("sending request");
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = () => {
+                if ( xhr.readyState == 4 && xhr.status == 200 )  {
+                    let newUserName = xhr.responseText;
 
-                        console.log("Assigning user name: " + newUserName)
+                    console.log("Assigning user name: " + newUserName)
 
-                        this.ws.send(JSON.stringify(
-                            {
-                                "conversationId": "public",
-                                "author": newUserName,
-                                "timestamp": new Date(),
-                                "message": "( - joined the chat room - )",
-                            }
-                        ));
-                        console.log("Setting name to " + newUserName);
-                        localStorage.setItem('userName', newUserName);
-                        this.setState({
-                            currentUser: newUserName
-                        })
-                    }
+                    this.ws.send(JSON.stringify(
+                        {
+                            "conversationId": "public",
+                            "author": newUserName,
+                            "timestamp": new Date(),
+                            "message": "( - joined the chat room - )",
+                        }
+                    ));
+                    console.log("Setting name to " + newUserName);
+                    localStorage.setItem('userName', newUserName);
+                    this.setState({
+                        currentUser: newUserName
+                    })
                 }
-                xhr.open("GET", '/getAName');
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.send();
-            }      
+            }
+            xhr.open("GET", '/getAName');
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send();              
+            }
         }
+        
+        
+
+        
         
         this.rename = this.rename.bind(this);   
     }
