@@ -30,35 +30,33 @@ export class App extends React.Component {
             this.state = {
                 currentUser: "( Generating... )"
             }
-            console.log(this.state);
+            ws.onopen = () => {
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = () => {
+                    if ( xhr.readyState == 4 && xhr.status == 200 )  {
+                        let newUserName = xhr.responseText;
 
-            let xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = () => {
-                if ( xhr.readyState == 4 && xhr.status == 200 )  {
-                    let newUserName = xhr.responseText;
+                        console.log("Assigning user name: " + newUserName)
 
-
-
-                    console.log("Assigning user name: " + newUserName)
-
-                    this.ws.send(JSON.stringify(
-                        {
-                            "conversationId": "public",
-                            "author": newUserName,
-                            "timestamp": new Date(),
-                            "message": "( - joined the chat room - )",
-                        }
-                    ));
-                    console.log("Setting name to " + newUserName);
-                    localStorage.setItem('userName', newUserName);
-                    this.setState({
-                        currentUser: newUserName
-                    })
+                        this.ws.send(JSON.stringify(
+                            {
+                                "conversationId": "public",
+                                "author": newUserName,
+                                "timestamp": new Date(),
+                                "message": "( - joined the chat room - )",
+                            }
+                        ));
+                        console.log("Setting name to " + newUserName);
+                        localStorage.setItem('userName', newUserName);
+                        this.setState({
+                            currentUser: newUserName
+                        })
+                    }
                 }
-            }
-            xhr.open("GET", '/getAName');
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.send();
+                xhr.open("GET", '/getAName');
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send();
+            }      
         }
 
 
