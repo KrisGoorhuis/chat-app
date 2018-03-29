@@ -24,15 +24,28 @@ export class App extends React.Component {
             }
         }
 
-        function keepWebSocketOpen(ws) {
-            ws.send("ping");
-            setTimeout(function() {
-                keepWebSocketOpen(ws);
-            }, 5000);
-        };
+        
 
         this.ws.onopen = () => {
+
+            // Keeps the socket open
+            function keepWebSocketOpen(ws) {
+                ws.send(JSON.stringify({
+                    "isPing": true
+                }));
+                setTimeout(function() {
+                    keepWebSocketOpen(ws);
+                }, 5000);
+            };
             keepWebSocketOpen(this.ws);
+
+            // Puts our name on the active user list
+            if (localStorage.getItem("userName")) {
+                this.ws.send( JSON.stringify({
+                    "isConnection": true,
+                    "userName": localStorage.getItem("userName")
+                }));
+            }
             
             if (!localStorage.getItem("userName")) {
             this.state = {
@@ -45,7 +58,7 @@ export class App extends React.Component {
                 if ( xhr.readyState == 4 && xhr.status == 200 )  {
                     let newUserName = xhr.responseText;
 
-                    console.log("Assigning user name: " + newUserName)
+                    console.log("Assigning user name: " + newUserName);
 
                     this.ws.send(JSON.stringify(
                         {

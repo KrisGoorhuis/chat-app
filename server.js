@@ -21,6 +21,7 @@ app.use(express.static(path.join(__dirname, '/dist')));
 const mongoUriEnvironmentAddress = process.env.MONGOLAB_URI;
 const mongoAddress = "mongodb://Kris:password@ds263138.mlab.com:63138/chat";
 
+let activeUsersArray = [];
 
 
 function saveChatMessage(message) {
@@ -47,11 +48,32 @@ function saveChatMessage(message) {
 wss.on('connection', function connection(ws, request) {
 	console.log("client connect at " + new Date());
 	console.log("Number of clients: " + wss.clients.size);
+
 	ws.on('message', function message(message) {
-		if (message === "ping") { 
+		console.log(message);
+		message = JSON.parse(message);
+
+		function updateActiveUsersList() {
+			wss.clients.forEach(function each(client) {
+				if ( client.readyState === WebSocket.OPEN) {
+					client.send(JSON.stringify({
+						activeUsersUpdate: activeUsersArray
+					}));		
+				}
+			});
+		}
+
+		if (message.isPing) { 
 			// stay open!
+		} else if (message.isConnection) {
+			activeUsersArray.push(message.userName);
+			updateActiveUsersList();
+			
+		} else if (message.isDisconnection) {
+			let index = activeUsersArray.indexOf(message.userName);
+			activeUsersArray.slice(index, 1);
+			updateActiveUsersList();
 		} else {
-			message = JSON.parse(message);
 			console.log("Message: ");
 			console.log((message));
 			

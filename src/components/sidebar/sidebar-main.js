@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {AllUsersList} from './all-users-list.js';
+import {AllUsersList} from './active-users-list.js';
 import {PrivateConversationsList} from './private-conversations-list.js';
 
 export class SideBar extends React.Component {
@@ -24,8 +24,8 @@ export class SideBar extends React.Component {
                 <div id="this-user" onClick={ (e) => this.props.thingabob("it worked?")}>
                     Chatting as {this.props.currentUser}
                 </div>
-                <AllUsersList fakeUsers={fakeUsers} />
-                <PrivateConversationsList fakeUsers={fakeUsers} />
+                <AllUsersList ws={this.props.ws} fakeUsers={fakeUsers} />
+                <PrivateConversationsList ws={this.props.ws} fakeUsers={fakeUsers} />
             </div>
         )
     }

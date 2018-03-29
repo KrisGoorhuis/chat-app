@@ -17,7 +17,7 @@ export class AllUsersList extends React.Component {
 
         return (
             <div id="container-sidebar-all-users-list" className="">
-                <h4>Users Online</h4>
+                <h4>Active Users</h4>
                 <div id="all-users-list">
                     { 
                         fakeUsers.map( (user, index) => {
