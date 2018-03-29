@@ -11,7 +11,7 @@ export class ChatLog extends React.Component {
         this.ws.onmessage = (message) => {
           
             let newMessages = this.state.messages;
-            // newMessages.push(JSON.parse(message.data))
+            newMessages.push(JSON.parse(message.data))
             this.setState({
                 messages: newMessages
             })
