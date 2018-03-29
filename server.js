@@ -48,18 +48,21 @@ wss.on('connection', function connection(ws, request) {
 	console.log("client connect at " + new Date());
 	console.log("Number of clients: " + wss.clients.size);
 	ws.on('message', function message(message) {
-		
 		message = JSON.parse(message);
-		console.log("Message: ");
-		console.log((message));
-		
-		wss.clients.forEach(function each(client) {
-			if ( client.readyState === WebSocket.OPEN) {
-			  	client.send(JSON.stringify(message));
-				
-			}
-		});
-		saveChatMessage(message);
+
+		if (message = "ping") { 
+			// stay open!
+		} else {
+			console.log("Message: ");
+			console.log((message));
+			
+			wss.clients.forEach(function each(client) {
+				if ( client.readyState === WebSocket.OPEN) {
+					  client.send(JSON.stringify(message));		
+				}
+			});
+			saveChatMessage(message);
+		}
 	})
 	ws.on('close', function() {
 		console.log("client disconnect at " + new Date());

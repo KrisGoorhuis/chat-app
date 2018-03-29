@@ -18,6 +18,10 @@ export class App extends React.Component {
 
         this.ws = new WebSocket( location.origin.replace(/^http/, 'ws') || 'ws://localhost:3000' );
         
+        function keepWebSocketOpen() {
+            setTimeout(keepWebSocketOpen, 5000);
+        };
+        keepWebSocketOpen();
 
         if (localStorage.getItem("userName")) {
             this.state = {

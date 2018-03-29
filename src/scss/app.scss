@@ -50,7 +50,7 @@ $app-height: 600px;
         max-height: $all-users-height;
         #all-users-list {
             max-height: $all-users-height - $h4-height; 
-            overflow-y: scroll;
+            overflow-y: auto;
             //overflow-x: hidden;
             padding-left: 15px;
         }
@@ -78,7 +78,7 @@ $app-height: 600px;
 
     #chat-log {
         padding: 10px;
-    	overflow-y: scroll;
+    	overflow-y: auto;
 	    overflow-x: hidden;
     }
 
