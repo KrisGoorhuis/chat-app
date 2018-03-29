@@ -20,12 +20,6 @@ export class ChatLog extends React.Component {
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = () => {
             if ( xhr.readyState == 4 && xhr.status == 200 )  {
-                // console.log(JSON.parse(xhr.response));
-                // console.log(typeof(JSON.parse(xhr.response)));
-                // let arr = JSON.parse(xhr.response);
-                // arr.push({"test": "Success?"});
-                // console.log(arr);
-                // console.log(typeof(arr));
                 this.setState({
                     messagesLoaded: true,
                     messages: JSON.parse(xhr.response)

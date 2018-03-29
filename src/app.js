@@ -30,7 +30,7 @@ export class App extends React.Component {
             this.state = {
                 currentUser: "( Generating... )"
             }
-            ws.onopen = () => {
+            this.ws.onopen = () => {
                 let xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = () => {
                     if ( xhr.readyState == 4 && xhr.status == 200 )  {
