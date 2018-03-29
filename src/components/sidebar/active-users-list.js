@@ -20,9 +20,7 @@ export class AllUsersList extends React.Component {
                 <h4>Active Users</h4>
                 <div id="all-users-list">
                     { 
-                        fakeUsers.map( (user, index) => {
-                            return <div className="user-name" key={user + " " + index}> {user} </div>
-                        })
+                        
                     }
                 </div>
             </div>

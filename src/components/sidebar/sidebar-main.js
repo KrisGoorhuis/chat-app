@@ -9,23 +9,27 @@ export class SideBar extends React.Component {
     constructor(props) {
         super(props);
 
-        this.fakeUsers = [];
-        for (let i = 0; i < 100; i++) {
-            this.fakeUsers.push("Kristopher Robin");
+        this.ws = this.props.ws;
+
+        this.props.ws.onmessage = (message) => {
+            console.log("got a message! sidebar main");
+            console.log(message.data);
+            if (message.activeUsersUpdate.data) {
+                console.log(message.activeUsersUpdate);
+            }
         }
         
     }
     
     render() {
-        const fakeUsers = this.fakeUsers;
 
         return (
             <div id="container-sidebar" className="">
                 <div id="this-user" onClick={ (e) => this.props.thingabob("it worked?")}>
                     Chatting as {this.props.currentUser}
                 </div>
-                <AllUsersList ws={this.props.ws} fakeUsers={fakeUsers} />
-                <PrivateConversationsList ws={this.props.ws} fakeUsers={fakeUsers} />
+                <AllUsersList ws={this.props.ws} />
+                <PrivateConversationsList ws={this.props.ws} />
             </div>
         )
     }

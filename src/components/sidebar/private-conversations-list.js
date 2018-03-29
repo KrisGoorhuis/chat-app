@@ -10,7 +10,7 @@ export class PrivateConversationsList extends React.Component {
     }
 
     render() {
-        const privateConversationList = this.props.fakeUsers;
+        const privateConversationList = [];
 
         return (
             <div id="container-sidebar-private-conversations" className="">
