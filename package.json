@@ -6,8 +6,8 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "bootstrap": "^3.3.7",
+    "bootstrap-loader": "^2.2.0",
     "bootstrap-sass": "^3.3.7",
-    "bootstrap-sass-loader": "^1.0.10",
     "express": "4.16.2",
     "font-awesome": "^4.7.0",
     "fs": "0.0.1-security",

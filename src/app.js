@@ -50,6 +50,7 @@ export class App extends React.Component {
                         }
                     ));
                     console.log("Setting name to " + newUserName);
+                    localStorage.setItem('userName', newUserName);
                     this.setState({
                         currentUser: newUserName
                     })
