@@ -50,14 +50,14 @@ wss.on('connection', function connection(ws, request) {
 	console.log("Number of clients: " + wss.clients.size);
 
 	ws.on('message', function message(message) {
-		console.log(message);
+		//console.log(message);
 		message = JSON.parse(message);
 
 		function updateActiveUsersList() {
 			console.log("sending active users list update");
 			wss.clients.forEach(function each(client) {
 				if ( client.readyState === WebSocket.OPEN) {
-					console.log("Two this many users");
+					console.log("To this many users");
 					client.send(JSON.stringify({
 						activeUsersUpdate: activeUsersArray
 					}));		
