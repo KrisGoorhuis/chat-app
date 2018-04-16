@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
+// Child of sidebar-main.js
 export class AllUsersList extends React.Component {
     
     constructor(props) {
@@ -26,4 +26,4 @@ export class AllUsersList extends React.Component {
             </div>
         )
     }
-}
+} 

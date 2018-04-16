@@ -11,13 +11,13 @@ export class SideBar extends React.Component {
 
         this.ws = this.props.ws;
 
-        this.props.ws.onmessage = (message) => {
-            console.log("got a message! sidebar main");
-            console.log(message.data);
-            if (message.activeUsersUpdate.data) {
-                console.log(message.activeUsersUpdate);
-            }
-        }
+        // this.props.ws.onmessage = (message) => {
+        //     console.log("got a message! sidebar main");
+        //     console.log(message);
+        //     if (message.activeUsersUpdate) {
+        //         console.log(message.activeUsersUpdate);
+        //     }
+        // }
         
     }
     

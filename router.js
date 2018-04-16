@@ -102,7 +102,10 @@ module.exports = function(app) {
     
             db.collection("messages", (error, collection) => {
                 collection.find({"conversationId": "public"}).toArray( (error, items) => {
-                    response.send(items);
+                    let responseObject = {};
+                    responseObject.type = "messages";                    
+                    responseObject.messages = items;
+                    response.send(responseObject);
                 });
             });
         });

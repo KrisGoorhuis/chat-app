@@ -6,10 +6,6 @@ import {ChatLog} from './chat-log.js';
 import {ChatInput} from './chat-input.js';
 
 
-
-
-
-
 export class ChatWindow extends React.Component {
     constructor(props) {
         super(props);
@@ -22,7 +18,8 @@ export class ChatWindow extends React.Component {
         }
         
         this.switchChatWindows = this.switchChatWindows.bind(this);
-        
+        console.log("chat main props:")
+        console.log(this.props);
     }
 
     
@@ -30,14 +27,13 @@ export class ChatWindow extends React.Component {
         // Tabs at the top
     }
 
-    
 
     render() {
 
         return (
             
             <div id="container-chat" className="">
-                <ChatLog ws={this.ws} currentChatWindow={this.currentChatWindow} switchChatWindows={this.switchChatWindows} rename={this.props.rename} />
+                <ChatLog ws={this.ws} currentChatWindow={this.currentChatWindow} switchChatWindows={this.switchChatWindows} messagesLoaded={this.props.messagesLoaded} messages={this.props.messages} rename={this.props.rename} />
                 <ChatInput ws={this.ws} currentUser={this.props.currentUser} currentChatWindow={this.state.currentChatWindow} rename={this.props.rename} />
             </div>
             

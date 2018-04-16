@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
+// Child of sidebar-main.js
 export class PrivateConversationsList extends React.Component {
     
     constructor(props) {
@@ -18,7 +18,7 @@ export class PrivateConversationsList extends React.Component {
                <div id="private-conversations-list">
                     {
                         privateConversationList.length === 0 &&
-                        <div>No private conversations</div>
+                        <div>Coming soon!</div> // No private conversations
                     }
                     
                     { 

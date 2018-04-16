@@ -2,13 +2,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+// Child of chat-window-main.js
 export class ChatInput extends React.Component {
     constructor(props) {
         super(props);
         
-        this.ws = this.props.ws;
-     
-        
+        this.ws = this.props.ws;   
     }
 
     submitMessage(element) {
@@ -24,28 +23,7 @@ export class ChatInput extends React.Component {
                         "timestamp": new Date(),
                         "message": this.chatInputElement.value,
                     }
-                ));
-            // let xmlRequest = new XMLHttpRequest();
-            // xmlRequest.onreadystatechange = () => {
-            //     if ( xmlRequest.readyState == 4 && xmlRequest.status == 200 )  {
-            //         //do stuff
-            //     }
-            // }
-            // xmlRequest.open("POST", '/postGeneralChatMessage');
-            // xmlRequest.setRequestHeader("Content-Type", "application/json");
-
-            
-
-            // xmlRequest.send(JSON.stringify(
-            //     {
-            //         "conversationId": "public",
-            //         "author": this.props.currentUser,
-            //         "timestamp": new Date(),
-            //         "message": this.chatInputElement.value,
-            //     }
-            // ));
-
-            
+                ));        
         }
 
         // if (currentChatWindow === "private") {

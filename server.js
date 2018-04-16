@@ -57,8 +57,8 @@ wss.on('connection', function connection(ws, request) {
 			console.log("sending active users list update");
 			wss.clients.forEach(function each(client) {
 				if ( client.readyState === WebSocket.OPEN) {
-					console.log("To this many users");
 					client.send(JSON.stringify({
+						type: "users",
 						activeUsersUpdate: activeUsersArray
 					}));		
 				}
@@ -76,12 +76,13 @@ wss.on('connection', function connection(ws, request) {
 			activeUsersArray.slice(index, 1);
 			updateActiveUsersList();
 		} else {
-			console.log("Message: ");
-			console.log((message));
+			let messageObject = {};
+			messageObject.type = "message";
+			messageObject.newMessage = message;
 			
 			wss.clients.forEach(function each(client) {
 				if ( client.readyState === WebSocket.OPEN) {
-					  client.send(JSON.stringify(message));		
+					  client.send(JSON.stringify(messageObject));		
 				}
 			});
 			saveChatMessage(message);

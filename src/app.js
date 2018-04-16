@@ -39,20 +39,29 @@ export class App extends React.Component {
             };
             keepWebSocketOpen(this.ws);
 
+            console.log("local username: ");
+            console.log(localStorage.getItem("userName"));
             // Puts our name on the active user list
             if (localStorage.getItem("userName")) {
                 this.ws.send( JSON.stringify({
                     "isConnection": true,
                     "userName": localStorage.getItem("userName")
                 }));
+                this.setState({
+                    currentUser: localStorage.getItem("userName")
+                })
             }
             
             if (!localStorage.getItem("userName")) {
-            this.state = {
+                console.log("no username")
+            this.setState = {
                 currentUser: "( Generating... )"
             }
             
             console.log("sending request");
+
+
+            // Get a new user name from the server and save it client side.
             let xhr = new XMLHttpRequest();
             xhr.onreadystatechange = () => {
                 if ( xhr.readyState == 4 && xhr.status == 200 )  {
@@ -81,10 +90,45 @@ export class App extends React.Component {
             }
         }
         
-        
+        this.ws.onmessage = (message) => {
+            let parsedMessage = JSON.parse(message.data)
+            console.log(parsedMessage);
+            if (parsedMessage.type === "users") {
+                console.log("got users");
+            }
 
-        
-        
+            if (parsedMessage.type === "message") {
+                let newMessages = this.state.messages;
+                newMessages.push(parsedMessage.newMessage);
+    
+                console.log(newMessages);
+                this.setState({
+                    messages: newMessages
+                })
+            }
+        }
+
+        let xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+            if ( xhr.readyState == 4 && xhr.status == 200 )  {
+                this.setState({
+                    messages: JSON.parse(xhr.response).messages,
+                    messagesLoaded: true
+                })
+                console.log("received messages");
+                console.log(this.state);
+            }
+        }
+        xhr.open("GET", '/fetchChatHistory');
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send();
+
+
+        this.state = {
+            messages: [],
+            messagesLoaded: false,
+        }
+
         this.rename = this.rename.bind(this);   
     }
 
@@ -102,8 +146,17 @@ export class App extends React.Component {
                 <Header />
                 <div id="container-main-content" className="container-fluid">
                     <div>{this.currentUser}</div>
-                    <SideBar ws={this.ws} currentUser={this.state.currentUser} rename={this.rename} />
-                    <ChatWindow ws={this.ws} currentUser={this.state.currentUser} rename={this.rename} />
+                    <SideBar ws={this.ws} 
+                        currentUser={this.state.currentUser} 
+                        rename={this.rename} 
+                    />
+                    <ChatWindow 
+                        ws={this.ws} 
+                        currentUser={this.state.currentUser} 
+                        messages={this.state.messages} 
+                        messagesLoaded={this.state.messagesLoaded} 
+                        rename={this.rename} 
+                    />
                 </div>
             </div>
         )
