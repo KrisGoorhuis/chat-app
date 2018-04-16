@@ -1,1 +1,1 @@
-A simple chat app.
+Early WIP chat app.
