@@ -16,7 +16,7 @@ $app-height: 600px;
 #container-main-content {
     padding: 0px;
     display: flex;
-    max-height: $app-height;
+    height: $app-height;
 }
 
 #container-sidebar {

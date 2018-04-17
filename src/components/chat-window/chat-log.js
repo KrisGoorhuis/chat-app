@@ -14,6 +14,9 @@ export class ChatLog extends React.Component {
         //     messagesLoaded: this.props.messagesLoaded,
         //     messages: this.props.messages
         // }
+        this.state = {
+            preparingToAutoscroll: false
+        }
     }
 
     // var offset = new Date().getTimezoneOffset();
@@ -27,11 +30,25 @@ export class ChatLog extends React.Component {
     addNewMessage(message) {
 
     }
+    
+    componentWillUpdate() {
+        let {chatLog} = this.refs;
 
-    componentDidMount() {
-        let chatLog = this.chatLog;
-        chatLog.scrollTop = chatLog.scrollHeight;
+        // scrollHeight: total height with including stuff scrolled off screen
+        // clientHeight: viewable element height as far as CSS is concerned
+        // scrollTop: distance the element has been scrolled from the top. 0 means we're at the top. Max scrollTop is scrollHeight - clientHeight.
+        // Maximum .scrollTop is basically .scrollBottom, but that doesn't exist in vanilla JS right now.
+        this.isCurrentlyScrolledToBottom = chatLog.scrollHeight - chatLog.clientHeight === chatLog.scrollTop;
     } 
+
+    componentDidUpdate() {
+        let {chatLog} = this.refs;
+
+        if (this.isCurrentlyScrolledToBottom) {
+            let scrollDistance = chatLog.scrollHeight - chatLog.clientHeight + 30; // TODO: Base this "+30" bit on chat message CSS height when that's determined.
+            chatLog.scrollTop = scrollDistance; 
+        }
+    }
 
     // If we set and destructure a state based on props in the constructor, we'll never encounter a situation where React rerenders our state when props change.
     // Props will update but state won't - We don't call setState anywhere.
@@ -40,7 +57,7 @@ export class ChatLog extends React.Component {
         const {messagesLoaded, messages} = this.props;
 
         return (
-            <div id="chat-log" ref={input => this.chatLog = input}>
+            <div id="chat-log" ref="chatLog">
                 {
                     !messagesLoaded &&
                     <div>Fetching messages...{messages}</div>
