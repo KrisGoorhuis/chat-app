@@ -59,7 +59,7 @@ export class App extends React.Component {
                                 "conversationId": "public",
                                 "author": newUserName,
                                 "timestamp": new Date(),
-                                "message": "( - joined the chat room - )",
+                                "message": "( - joined the room - )",
                             }
                         ));
                         console.log("Setting name to " + newUserName);
@@ -117,7 +117,8 @@ export class App extends React.Component {
         this.state = {
             messages: [],
             messagesLoaded: false,
-            activeUsers: ["Checking..."]
+            activeUsers: ["Checking..."],
+            currentUser: "( Fetching... )"
         }  
     }
    
