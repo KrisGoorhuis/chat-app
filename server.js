@@ -21,7 +21,8 @@ app.use(express.static(path.join(__dirname, '/dist')));
 const mongoUriEnvironmentAddress = process.env.MONGOLAB_URI;
 const mongoAddress = "mongodb://Kris:password@ds263138.mlab.com:63138/chat";
 
-let activeUsersArray = [];
+let activeUsersObject = {};
+// let timeSinceLastCull = Date.now();
 
 
 function saveChatMessage(message) {
@@ -41,41 +42,92 @@ function saveChatMessage(message) {
 			}
 		
 		);
-		console.log("saving");
 	})
 }
 
+function sendActiveUserList() {
+	console.log("sending active users list");
+
+	wss.clients.forEach(function each(client) {
+		if ( client.readyState === WebSocket.OPEN) {
+			client.send(JSON.stringify({
+				type: "users",
+				activeUsersObject: activeUsersObject
+			}));
+		}
+	});
+}
+
+function keepUserActive(userName) {
+
+	if (activeUsersObject.hasOwnProperty(userName) === false) {
+		activeUsersObject[userName] = {"lastPing": Date.now()}
+	}
+	if (activeUsersObject.hasOwnProperty(userName)) {
+		activeUsersObject[userName].lastPing = Date.now()
+	}
+}
+
+function cullInactiveUsers(disconnectOccurred) {
+
+	// if (disconnectOccurred) {
+
+	// 	clearTimeout(timeout);
+	// 	Object.keys(activeUsersObject).forEach( (key) => {
+	// 		let age = Date.now() - activeUsersObject[key].lastPing;
+		
+	// 		if (age > timeSinceLastCull) {
+	// 			delete activeUsersObject[key]
+	// 		}
+	// 	} ) 
+	// 	console.log("Deleting a logout!");
+		
+	// 	sendActiveUserList();
+	// 	timeSinceLastCull = Date.now();
+	// }
+	
+
+	var timeout = setTimeout( (timeSinceLastCull) => {
+		cullInactiveUsers(false);
+	}, 5000)
+
+	if (disconnectOccurred === false) {
+
+		Object.keys(activeUsersObject).forEach( (key) => {
+			let age = Date.now() - activeUsersObject[key].lastPing;
+		
+			if ( age >= 6000) {
+				delete activeUsersObject[key];
+			}
+		} ) 
+		
+		sendActiveUserList();
+		//timeSinceLastCull = Date.now();
+	}
+	
+	console.log(activeUsersObject);
+	
+}
+
+cullInactiveUsers();
+
 wss.on('connection', function connection(ws, request) {
-	console.log("client connect at " + new Date());
-	console.log("Number of clients: " + wss.clients.size);
 
 	ws.on('message', function message(message) {
-		//console.log(message);
 		message = JSON.parse(message);
 
-		function updateActiveUsersList() {
-			console.log("sending active users list update");
-			wss.clients.forEach(function each(client) {
-				if ( client.readyState === WebSocket.OPEN) {
-					client.send(JSON.stringify({
-						type: "users",
-						activeUsersUpdate: activeUsersArray
-					}));		
-				}
-			});
-		}
+		
 
 		if (message.isPing) { 
-			// stay open!
+			keepUserActive(message.userName);
+			console.log("got a ping from " + message.userName);
+
 		} else if (message.isConnection) {
-			activeUsersArray.push(message.userName);
-			updateActiveUsersList();
-			
-		} else if (message.isDisconnection) {
-			let index = activeUsersArray.indexOf(message.userName);
-			activeUsersArray.slice(index, 1);
-			updateActiveUsersList();
+			// Do
+			sendActiveUserList();
+
 		} else {
+			keepUserActive(message.author);
 			let messageObject = {};
 			messageObject.type = "message";
 			messageObject.newMessage = message;
@@ -85,11 +137,13 @@ wss.on('connection', function connection(ws, request) {
 					  client.send(JSON.stringify(messageObject));		
 				}
 			});
+
 			saveChatMessage(message);
 		}
 	})
 	ws.on('close', function() {
-		console.log("client disconnect at " + new Date());
+		// let disconnectOccurred = true;
+		// cullInactiveUsers(disconnectOccurred);
 	})
 })
 

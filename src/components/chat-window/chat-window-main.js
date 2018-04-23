@@ -18,8 +18,6 @@ export class ChatWindow extends React.Component {
         }
         
         this.switchChatWindows = this.switchChatWindows.bind(this);
-        console.log("chat main props:")
-        console.log(this.props);
     }
 
     

@@ -11,11 +11,6 @@ export class App extends React.Component {
     constructor(props) {
         super(props);
 
-        // Get chat history
-            // Pull private conversations if cookie thing exists (user sessions?)
-            // Otherwise assign user name
-                // If word combination existed previously, add an icrementing number until successful
-
         this.ws = new WebSocket( location.origin.replace(/^http/, 'ws') || 'ws://localhost:3000' );
 
         if (localStorage.getItem("userName")) {
@@ -24,24 +19,20 @@ export class App extends React.Component {
             }
         }
 
-        
 
         this.ws.onopen = () => {
 
-            // Keeps the socket open
-            function keepWebSocketOpen(ws) {
-                ws.send(JSON.stringify({
-                    "isPing": true
+             // Keeps the socket open and keeps us on the active user list.
+             let sendPing = () => {
+                this.ws.send(JSON.stringify({
+                    "isPing": true,
+                    "userName": this.state.currentUser
                 }));
-                setTimeout(function() {
-                    keepWebSocketOpen(ws);
+                setTimeout( () => {
+                    sendPing();
                 }, 5000);
             };
-            keepWebSocketOpen(this.ws);
-
-            console.log("local username: ");
-            console.log(localStorage.getItem("userName"));
-            // Puts our name on the active user list
+            
             if (localStorage.getItem("userName")) {
                 this.ws.send( JSON.stringify({
                     "isConnection": true,
@@ -50,63 +41,63 @@ export class App extends React.Component {
                 this.setState({
                     currentUser: localStorage.getItem("userName")
                 })
+                sendPing();
             }
             
             if (!localStorage.getItem("userName")) {
-                console.log("no username")
-            this.setState = {
-                currentUser: "( Generating... )"
-            }
-            
-            console.log("sending request");
+                this.setState({
+                    currentUser: "( Generating... )"
+                })
+                
+                // Get a new user name from the server and save it client side.
+                let xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = () => {
+                    if ( xhr.readyState == 4 && xhr.status == 200 )  {
+                        let newUserName = xhr.responseText;
+                        this.ws.send(JSON.stringify(
+                            {
+                                "conversationId": "public",
+                                "author": newUserName,
+                                "timestamp": new Date(),
+                                "message": "( - joined the chat room - )",
+                            }
+                        ));
+                        console.log("Setting name to " + newUserName);
+                        localStorage.setItem('userName', newUserName);
 
-
-            // Get a new user name from the server and save it client side.
-            let xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = () => {
-                if ( xhr.readyState == 4 && xhr.status == 200 )  {
-                    let newUserName = xhr.responseText;
-
-                    console.log("Assigning user name: " + newUserName);
-
-                    this.ws.send(JSON.stringify(
-                        {
-                            "conversationId": "public",
-                            "author": newUserName,
-                            "timestamp": new Date(),
-                            "message": "( - joined the chat room - )",
-                        }
-                    ));
-                    console.log("Setting name to " + newUserName);
-                    localStorage.setItem('userName', newUserName);
-                    this.setState({
-                        currentUser: newUserName
-                    })
+                        this.setState({
+                            currentUser: newUserName
+                        });
+                        sendPing();
+                    }
                 }
-            }
-            xhr.open("GET", '/getAName');
-            xhr.setRequestHeader("Content-Type", "application/json");
-            xhr.send();              
+                xhr.open("GET", '/getAName');
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send();              
             }
         }
         
         this.ws.onmessage = (message) => {
             let parsedMessage = JSON.parse(message.data)
+            console.log("Message received: ")
             console.log(parsedMessage);
             if (parsedMessage.type === "users") {
-                console.log("got users");
+
+                this.setState({
+                    activeUsers: Object.getOwnPropertyNames(parsedMessage.activeUsersObject)
+                })
             }
 
             if (parsedMessage.type === "message") {
                 let newMessages = this.state.messages;
                 newMessages.push(parsedMessage.newMessage);
     
-                console.log(newMessages);
                 this.setState({
                     messages: newMessages
                 })
             }
         }
+
 
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = () => {
@@ -115,8 +106,7 @@ export class App extends React.Component {
                     messages: JSON.parse(xhr.response).messages,
                     messagesLoaded: true
                 })
-                console.log("received messages");
-                console.log(this.state);
+                console.log("received messages via xhr");
             }
         }
         xhr.open("GET", '/fetchChatHistory');
@@ -127,16 +117,8 @@ export class App extends React.Component {
         this.state = {
             messages: [],
             messagesLoaded: false,
-        }
-
-        this.rename = this.rename.bind(this);   
-    }
-
-    rename(newName) {
-        this.setState({
-            "currentUser": newName
-        })
-        console.log("renaming!");
+            activeUsers: ["Checking..."]
+        }  
     }
    
 
@@ -146,8 +128,10 @@ export class App extends React.Component {
                 <Header />
                 <div id="container-main-content" className="container-fluid">
                     <div>{this.currentUser}</div>
-                    <SideBar ws={this.ws} 
+                    <SideBar 
+                        ws={this.ws} 
                         currentUser={this.state.currentUser} 
+                        activeUsers={this.state.activeUsers}
                         rename={this.rename} 
                     />
                     <ChatWindow 

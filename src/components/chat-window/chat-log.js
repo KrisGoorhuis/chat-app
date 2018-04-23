@@ -33,12 +33,12 @@ export class ChatLog extends React.Component {
     
     componentWillUpdate() {
         let {chatLog} = this.refs;
-
+        
         // scrollHeight: total height with including stuff scrolled off screen
         // clientHeight: viewable element height as far as CSS is concerned
         // scrollTop: distance the element has been scrolled from the top. 0 means we're at the top. Max scrollTop is scrollHeight - clientHeight.
         // Maximum .scrollTop is basically .scrollBottom, but that doesn't exist in vanilla JS right now.
-        this.isCurrentlyScrolledToBottom = chatLog.scrollHeight - chatLog.clientHeight === chatLog.scrollTop;
+        this.isCurrentlyScrolledToBottom = chatLog.scrollHeight - chatLog.clientHeight <= chatLog.scrollTop;
     } 
 
     componentDidUpdate() {
@@ -50,7 +50,7 @@ export class ChatLog extends React.Component {
         }
     }
 
-    // If we set and destructure a state based on props in the constructor, we'll never encounter a situation where React rerenders our state when props change.
+    // If we set and destructure a state based on props in the constructor, we'll never encounter a situation where React rerenders our state when props change. Unless we do a componendDidUpdate thing?
     // Props will update but state won't - We don't call setState anywhere.
     // So we're just gonna go with this.props in this render.
     render() {
@@ -69,7 +69,6 @@ export class ChatLog extends React.Component {
                     })
                 }
                 
-
             </div>            
         )
     }

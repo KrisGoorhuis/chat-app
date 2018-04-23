@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {AllUsersList} from './active-users-list.js';
+import {ActiveUsersList} from './active-users-list.js';
 import {PrivateConversationsList} from './private-conversations-list.js';
 
 export class SideBar extends React.Component {
@@ -10,14 +10,6 @@ export class SideBar extends React.Component {
         super(props);
 
         this.ws = this.props.ws;
-
-        // this.props.ws.onmessage = (message) => {
-        //     console.log("got a message! sidebar main");
-        //     console.log(message);
-        //     if (message.activeUsersUpdate) {
-        //         console.log(message.activeUsersUpdate);
-        //     }
-        // }
         
     }
     
@@ -28,7 +20,7 @@ export class SideBar extends React.Component {
                 <div id="this-user" onClick={ (e) => this.props.thingabob("it worked?")}>
                     Chatting as {this.props.currentUser}
                 </div>
-                <AllUsersList ws={this.props.ws} />
+                <ActiveUsersList ws={this.props.ws} activeUsers={this.props.activeUsers} />
                 <PrivateConversationsList ws={this.props.ws} />
             </div>
         )
