@@ -10,21 +10,21 @@ export class PrivateConversationsList extends React.Component {
     }
 
     render() {
-        const privateConversationList = [];
+        const conversations = this.props.privateConversationsList;
 
         return (
             <div id="container-sidebar-private-conversations" className="">
                <h4>Private Conversations</h4>
                <div id="private-conversations-list">
                     {
-                        privateConversationList.length === 0 &&
-                        <div>Coming soon!</div> // No private conversations
+                        conversations.length === 0 &&
+                        <div>Double click someone's name to begin a private conversation</div>
                     }
                     
                     { 
-                        privateConversationList.length > 0 &&
-                        privateConversationList.map( (user, index) => {
-                            return <div className="user-name" key={user + " " + index}> {user} </div>
+                        conversations.length > 0 &&
+                        conversations.map( (user, index) => {
+                            return <div className="name" key={user + " " + index}> {user} </div>
                         })
                     }
                 </div>

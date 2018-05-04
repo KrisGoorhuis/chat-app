@@ -20,8 +20,16 @@ export class SideBar extends React.Component {
                 <div id="this-user" onClick={ (e) => this.props.thingabob("it worked?")}>
                     Chatting as {this.props.currentUser}
                 </div>
-                <ActiveUsersList ws={this.props.ws} activeUsers={this.props.activeUsers} />
-                <PrivateConversationsList ws={this.props.ws} />
+                <ActiveUsersList 
+                    ws={this.props.ws}
+                    activeUsers={this.props.activeUsers}
+                    openConversationTab={this.openConversationTab}
+                 />
+                <PrivateConversationsList 
+                    ws={this.props.ws} 
+                    privateConversationsList={this.props.privateConversationsList} 
+                    openConversationTab={this.openConversationTab}
+                />
             </div>
         )
     }

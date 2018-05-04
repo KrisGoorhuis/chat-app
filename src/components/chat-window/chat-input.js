@@ -17,12 +17,22 @@ export class ChatInput extends React.Component {
         if (this.props.currentChatWindow === "public") {
             this.ws.send(JSON.stringify(
                     {
-                        "conversationId": "public",
+                        "conversationType": "public",
                         "author": this.props.currentUser,
                         "timestamp": new Date(),
                         "message": this.chatInputElement.value,
                     }
                 ));        
+        } else if (this.props.currentChatWindow === "private") {
+            this.ws.send(JSON.stringify(
+                {
+                    "conversationType": "private",
+                    "author": this.props.currentUser,
+                    //"recipient": TODO
+                    "timestamp": new Date(),
+                    "message": this.chatInputElement.value,
+                }
+            ));   
         }
 
         // if (currentChatWindow === "private") {
@@ -30,7 +40,6 @@ export class ChatInput extends React.Component {
         // }
         
         this.chatInputElement.value = "";
-
     }
 
     render() {

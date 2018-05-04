@@ -9,30 +9,38 @@ import {ChatInput} from './chat-input.js';
 export class ChatWindow extends React.Component {
     constructor(props) {
         super(props);
-
-        this.ws = this.props.ws;
-
-        this.state = {
-            currentChatWindow: "public",
-            userName: this.props.userName
-        }
         
-        this.switchChatWindows = this.switchChatWindows.bind(this);
+        this.state = {
+            currentChatWindow: "public"
+        }
+
+        this.selectChatWindow = this.selectChatWindow.bind(this);
     }
 
-    
-    switchChatWindows() {
-        // Tabs at the top
+    selectChatWindow(window) {
+        this.setState({
+            currentChatWindow: window
+        })
     }
-
 
     render() {
 
         return (
             
             <div id="container-chat" className="">
-                <ChatLog ws={this.ws} currentChatWindow={this.currentChatWindow} switchChatWindows={this.switchChatWindows} messagesLoaded={this.props.messagesLoaded} messages={this.props.messages} rename={this.props.rename} />
-                <ChatInput ws={this.ws} currentUser={this.props.currentUser} currentChatWindow={this.state.currentChatWindow} rename={this.props.rename} />
+                <ChatLog 
+                    messagesLoaded={this.props.messagesLoaded} 
+                    messages={this.props.messages} 
+                    currentChatWindow={this.state.currentChatWindow} 
+                    privateConversationsList={this.props.privateConversationsList}
+                    openConversationTab={this.openConversationTab}
+                    closeConversationTab={this.closeConversationTab}
+                 />
+                <ChatInput 
+                    ws={this.props.ws} 
+                    currentUser={this.props.currentUser} 
+                    currentChatWindow={this.state.currentChatWindow} 
+                />
             </div>
             
         )

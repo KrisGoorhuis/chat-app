@@ -11,8 +11,7 @@ const WebSocket = require('ws');
 
 const app = express();
 const server = http.createServer(app);
-const io = require('socket.io')(server);
-const wss = new WebSocket.Server({server});
+const wss = new WebSocket.Server({server, clientTracking: true});
 
 const router = require('./router.js')(app);
 app.use(bodyParser.json());
@@ -22,6 +21,7 @@ const mongoUriEnvironmentAddress = process.env.MONGOLAB_URI;
 const mongoAddress = "mongodb://Kris:password@ds263138.mlab.com:63138/chat";
 
 let activeUsersObject = {};
+//let clients = [];
 // let timeSinceLastCull = Date.now();
 
 
@@ -31,22 +31,27 @@ function saveChatMessage(message) {
 			console.log(error);
 		}
 		let db = client.db("chat");
-		
-		message = message;
-		db.collection("messages").insert(
-			{
-				"conversationId": message.conversationId,
-				"author": message.author,
-				"timestamp": message.timestamp,
-				"message": message.message
-			}
-		
-		);
+		//console.log(message);
+		let messageObject = {
+			"conversationType": message.conversationType,
+			"author": message.author,
+			"timestamp": message.timestamp,
+			"message": message.message
+		}
+		if (message.conversationType === "private") {
+			messageObject.recipient = message.recipient;
+		}
+		db.collection("messages").insert(messageObject, () => {
+			console.log("post insert?")
+			console.log(messageObject);
+		});
+		console.log("inserted:");
+		console.log(messageObject);
 	})
 }
 
 function sendActiveUserList() {
-	console.log("sending active users list");
+	//console.log("sending active users list (" + new Date() + ")");
 
 	wss.clients.forEach(function each(client) {
 		if ( client.readyState === WebSocket.OPEN) {
@@ -58,92 +63,78 @@ function sendActiveUserList() {
 	});
 }
 
-function keepUserActive(userName) {
-
+function handleUserRegistry(userName, ws) {
 	if (activeUsersObject.hasOwnProperty(userName) === false) {
-		activeUsersObject[userName] = {"lastPing": Date.now()}
+		activeUsersObject[userName] = {
+			"lastPing": Date.now(),
+			"client": ws.toString
+		}
 	}
 	if (activeUsersObject.hasOwnProperty(userName)) {
 		activeUsersObject[userName].lastPing = Date.now()
 	}
 }
 
-function cullInactiveUsers(disconnectOccurred) {
-
-	// if (disconnectOccurred) {
-
-	// 	clearTimeout(timeout);
-	// 	Object.keys(activeUsersObject).forEach( (key) => {
-	// 		let age = Date.now() - activeUsersObject[key].lastPing;
-		
-	// 		if (age > timeSinceLastCull) {
-	// 			delete activeUsersObject[key]
-	// 		}
-	// 	} ) 
-	// 	console.log("Deleting a logout!");
-		
-	// 	sendActiveUserList();
-	// 	timeSinceLastCull = Date.now();
-	// }
-	
-
-	var timeout = setTimeout( (timeSinceLastCull) => {
+function cullInactiveUsers() {
+	var timeout = setTimeout( () => {
 		cullInactiveUsers(false);
 	}, 5000)
-
-	if (disconnectOccurred === false) {
-
-		Object.keys(activeUsersObject).forEach( (key) => {
-			let age = Date.now() - activeUsersObject[key].lastPing;
-		
-			if ( age >= 6000) {
-				delete activeUsersObject[key];
-			}
-		} ) 
-		
-		sendActiveUserList();
-		//timeSinceLastCull = Date.now();
-	}
-	
-	console.log(activeUsersObject);
-	
+	Object.keys(activeUsersObject).forEach( (key) => {
+		let age = Date.now() - activeUsersObject[key].lastPing;
+		if ( age >= 6000) {
+			delete activeUsersObject[key];
+		}
+	} ) 
+	sendActiveUserList();
+	//timeSinceLastCull = Date.now();
 }
 
 cullInactiveUsers();
 
-wss.on('connection', function connection(ws, request) {
+wss.on('connection', function connection(ws) {
 
+	// Store user names with a connection id
+	// Maybe wait until ws.on('message') in case a user name has not been assigned
 	ws.on('message', function message(message) {
 		message = JSON.parse(message);
 
-		
-
 		if (message.isPing) { 
-			keepUserActive(message.userName);
-			console.log("got a ping from " + message.userName);
+			handleUserRegistry(message.userName, ws);
+			//console.log("got a ping from " + message.userName);
 
 		} else if (message.isConnection) {
-			// Do
 			sendActiveUserList();
 
 		} else {
-			keepUserActive(message.author);
+			handleUserRegistry(message.author, ws);
 			let messageObject = {};
 			messageObject.type = "message";
 			messageObject.newMessage = message;
-			
-			wss.clients.forEach(function each(client) {
-				if ( client.readyState === WebSocket.OPEN) {
-					  client.send(JSON.stringify(messageObject));		
-				}
-			});
-
 			saveChatMessage(message);
+
+			// TODO
+			// Private messages totally untested. Gotta build the new tabs first.
+			if (message.conversationType === "private") {
+				wss.clients.forEach( (client) => {
+					// Client in wss's storage equals one of our stored users
+					activeUsersObject.forEach( (userObject) => {
+						if (client === userObject.client) {
+							client.send(JSON.stringify(messageObject));
+						}
+					})
+				})
+			} else if (message.conversationType === "public") {
+				wss.clients.forEach(function each(client) {
+					if ( client.readyState === WebSocket.OPEN) {
+						  client.send(JSON.stringify(messageObject));		
+					}
+				});
+	
+			} 
 		}
 	})
 	ws.on('close', function() {
-		// let disconnectOccurred = true;
-		// cullInactiveUsers(disconnectOccurred);
+		
 	})
 })
 

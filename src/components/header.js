@@ -13,7 +13,7 @@ export class Header extends React.Component {
         return (
             <div className="bg-primary">
                 <div id="container-header" className="container text-center">
-                    <h1>Kris' Chat Thing</h1>
+                    <h1>Kris' Placeholder</h1>
                     <h6>Kris accepts no responsibility for the content posted on this page.</h6>
                 </div>
             </div>

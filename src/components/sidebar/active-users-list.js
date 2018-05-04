@@ -18,7 +18,7 @@ export class ActiveUsersList extends React.Component {
                 <div id="all-users-list">
                     { 
                         this.props.activeUsers.map( (item) => {
-                            return <div key={item}>{item}</div>
+                            return <div className="name" key={item}>{item}</div>
                         } )
                     }
                 </div>

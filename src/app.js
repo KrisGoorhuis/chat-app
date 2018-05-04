@@ -11,6 +11,9 @@ export class App extends React.Component {
     constructor(props) {
         super(props);
 
+        this.openConversationTab = this.openConversationTab.bind(this);
+        this.closeConversationTab = this.closeConversationTab.bind(this);
+
         this.ws = new WebSocket( location.origin.replace(/^http/, 'ws') || 'ws://localhost:3000' );
 
         if (localStorage.getItem("userName")) {
@@ -18,7 +21,6 @@ export class App extends React.Component {
                 currentUser: localStorage.getItem("userName")
             }
         }
-
 
         this.ws.onopen = () => {
 
@@ -98,7 +100,6 @@ export class App extends React.Component {
             }
         }
 
-
         let xhr = new XMLHttpRequest();
         xhr.onreadystatechange = () => {
             if ( xhr.readyState == 4 && xhr.status == 200 )  {
@@ -112,14 +113,27 @@ export class App extends React.Component {
         xhr.open("GET", '/fetchChatHistory');
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send();
-
-
+        
         this.state = {
             messages: [],
             messagesLoaded: false,
             activeUsers: ["Checking..."],
-            currentUser: "( Fetching... )"
+            currentUser: "( Fetching... )",
+            privateConversationsList: ["Test one", "Test two"],
+            conversationTabs: ["Just test one"]
         }  
+    }
+
+    openConversationTab(name) {
+        let newTabList = this.state.conversationTabs;
+        newTabList.splice(newTabList.indexOf(name), 1);
+        this.setState({
+            conversationTabs: newTabList
+        });
+    };
+
+    closeConversationTab() {
+
     }
    
 
@@ -133,14 +147,18 @@ export class App extends React.Component {
                         ws={this.ws} 
                         currentUser={this.state.currentUser} 
                         activeUsers={this.state.activeUsers}
-                        rename={this.rename} 
+                        privateConversationsList={this.state.privateConversationsList}
+                        openConversationTab={this.openConversationTab}
+                        closeConversationTab={this.closeConversationTab}
                     />
                     <ChatWindow 
                         ws={this.ws} 
                         currentUser={this.state.currentUser} 
                         messages={this.state.messages} 
                         messagesLoaded={this.state.messagesLoaded} 
-                        rename={this.rename} 
+                        privateConversationsList={this.state.privateConversationsList}
+                        openConversationTab={this.openConversationTab}
+                        closeConversationTab={this.closeConversationTab}
                     />
                 </div>
             </div>

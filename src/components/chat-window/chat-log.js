@@ -7,13 +7,7 @@ import PropTypes from 'prop-types';
 export class ChatLog extends React.Component {
     constructor(props) {
         super(props);
-
-        this.ws = this.props.ws;
         
-        // this.state = {
-        //     messagesLoaded: this.props.messagesLoaded,
-        //     messages: this.props.messages
-        // }
         this.state = {
             preparingToAutoscroll: false
         }
@@ -25,10 +19,6 @@ export class ChatLog extends React.Component {
         let tIndex = rawDate.indexOf("T");
         let paredDate = rawDate.slice(tIndex + 1, tIndex + 9)
         return paredDate;
-    }
-
-    addNewMessage(message) {
-
     }
     
     componentWillUpdate() {
@@ -43,7 +33,7 @@ export class ChatLog extends React.Component {
 
     componentDidUpdate() {
         let {chatLog} = this.refs;
-
+        
         if (this.isCurrentlyScrolledToBottom) {
             let scrollDistance = chatLog.scrollHeight - chatLog.clientHeight + 30; // TODO: Base this "+30" bit on chat message CSS height when that's determined.
             chatLog.scrollTop = scrollDistance; 
@@ -54,22 +44,40 @@ export class ChatLog extends React.Component {
     // Props will update but state won't - We don't call setState anywhere.
     // So we're just gonna go with this.props in this render.
     render() {
-        const {messagesLoaded, messages} = this.props;
+        const {messagesLoaded, messages, privateConversationsList, currentChatWindow} = this.props;
 
         return (
-            <div id="chat-log" ref="chatLog">
-                {
-                    !messagesLoaded &&
-                    <div>Fetching messages...{messages}</div>
-                }
-                {
-                    messagesLoaded &&
-                    messages.map( (obj, index) => {
-                        return <div key={obj.timestamp}>{this.pareTimestamp(obj.timestamp)} - {obj.author}: {obj.message}</div>
-                    })
-                }
-                
-            </div>            
+            <div id="container-chat-log">
+
+                {/* Tabs at the top */}
+                <div id="conversation-tabs">
+                    <div className="active name">Public</div>
+                    {
+                        privateConversationsList.map( ( obj, index) => {
+                            return 
+                            <div className={obj === currentChatWindow ? "active name" : "name"} key={obj}> 
+                                {obj} 
+                            </div>
+                        })
+                    }
+                </div>
+
+                {/* Body of text for the selected tab */}
+                <div id="chat-log" ref="chatLog">
+                    {
+                        !messagesLoaded &&
+                        <div>Fetching messages...{messages}</div>
+                    }
+                    {
+                        messagesLoaded &&
+                        messages.map( (obj, index) => {
+                            return <div onDoubleClick={this.props.openConversationTab} key={obj.timestamp}>
+                                {this.pareTimestamp(obj.timestamp)} - <span className="name">{obj.author}</span>: {obj.message}
+                            </div>
+                        })
+                    }               
+                </div>  
+            </div>       
         )
     }
 }
