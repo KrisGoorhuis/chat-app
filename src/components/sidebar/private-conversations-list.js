@@ -1,3 +1,4 @@
+
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -10,7 +11,7 @@ export class PrivateConversationsList extends React.Component {
     }
 
     render() {
-        const conversations = this.props.privateConversationsList;
+        const conversations = this.props.privateConversationsArray;
 
         return (
             <div id="container-sidebar-private-conversations" className="">
@@ -18,13 +19,13 @@ export class PrivateConversationsList extends React.Component {
                <div id="private-conversations-list">
                     {
                         conversations.length === 0 &&
-                        <div>Double click someone's name to begin a private conversation</div>
+                        <div>Double click a name to open a one on one conversation.</div>
                     }
                     
                     { 
                         conversations.length > 0 &&
                         conversations.map( (user, index) => {
-                            return <div className="name" key={user + " " + index}> {user} </div>
+                            return <div onDoubleClick={ () => this.props.openConversationTab(user) } className="name" key={user + " " + index}> {user} </div>
                         })
                     }
                 </div>

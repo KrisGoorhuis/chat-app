@@ -40,27 +40,51 @@ export class ChatLog extends React.Component {
         }
     }
 
-    // If we set and destructure a state based on props in the constructor, we'll never encounter a situation where React rerenders our state when props change. Unless we do a componendDidUpdate thing?
-    // Props will update but state won't - We don't call setState anywhere.
-    // So we're just gonna go with this.props in this render.
+
     render() {
-        const {messagesLoaded, messages, privateConversationsList, currentChatWindow} = this.props;
+        const {
+            messagesLoaded,
+            messages,
+            conversationTabs,
+            privateConversationsArray,
+            privateConversationsObjects,
+            selectChatWindow,
+            currentChatWindow,
+            currentUser
+        } = this.props;
+
 
         return (
             <div id="container-chat-log">
 
                 {/* Tabs at the top */}
                 <div id="conversation-tabs">
-                    <div className="active name">Public</div>
+                    <div 
+                        onClick={ () => { selectChatWindow("public") } } 
+                        className={currentChatWindow === "public" ? "active name" : "name"}
+                    >
+                        Public
+                    </div>
+
                     {
-                        privateConversationsList.map( ( obj, index) => {
-                            return 
-                            <div className={obj === currentChatWindow ? "active name" : "name"} key={obj}> 
-                                {obj} 
+                        conversationTabs &&
+                        conversationTabs.map( ( recipient, index) => {
+                            return <div>
+                                <div 
+                                    onClick={ () => { selectChatWindow(recipient) } } 
+                                    className={recipient === currentChatWindow ? "active name" : "name"} 
+                                    key={recipient}
+                                > 
+                                    {recipient}
+                                </div>
+                                <div className="closeButton" onClick={ () => this.props.closeConversationTab(recipient) }> X </div>
                             </div>
                         })
                     }
+
                 </div>
+
+
 
                 {/* Body of text for the selected tab */}
                 <div id="chat-log" ref="chatLog">
@@ -68,15 +92,35 @@ export class ChatLog extends React.Component {
                         !messagesLoaded &&
                         <div>Fetching messages...{messages}</div>
                     }
+
+                    {/* Public Messages */}
                     {
-                        messagesLoaded &&
+                        (messagesLoaded && currentChatWindow === "public") &&
                         messages.map( (obj, index) => {
-                            return <div onDoubleClick={this.props.openConversationTab} key={obj.timestamp}>
+                            return <div 
+                                onDoubleClick={ () => this.props.openConversationTab(obj.author) }
+                                key={obj.timestamp}
+                            >
                                 {this.pareTimestamp(obj.timestamp)} - <span className="name">{obj.author}</span>: {obj.message}
                             </div>
                         })
-                    }               
+                    }    
+
+                    {/* Private Messages */}
+                    {
+                        (messagesLoaded && currentChatWindow !== "public" && privateConversationsObjects[currentChatWindow]) &&
+                        privateConversationsObjects[currentChatWindow].map( (obj, index) => {
+                            if (currentChatWindow === obj.recipient || obj.author) {
+                                // obj.map( (message, index) => {
+                                    return <div key={index}>
+                                        {this.pareTimestamp(obj.timestamp)} - <span className="name">{currentChatWindow === obj.author ? "You" : obj.author}</span>: {obj.message}
+                                    </div>
+                                // })
+                            }
+                        })
+                    }   
                 </div>  
+               
             </div>       
         )
     }

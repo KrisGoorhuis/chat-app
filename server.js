@@ -2,19 +2,16 @@
 // This file handles posting of messages through websockets. 
 
 const express = require('express');
-const bodyParser = require('body-parser');
 const http = require('http');
 const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
 const WebSocket = require('ws');
-
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({server, clientTracking: true});
 
 const router = require('./router.js')(app);
-app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/dist')));
 
 const mongoUriEnvironmentAddress = process.env.MONGOLAB_URI;
@@ -41,9 +38,8 @@ function saveChatMessage(message) {
 		if (message.conversationType === "private") {
 			messageObject.recipient = message.recipient;
 		}
-		db.collection("messages").insert(messageObject, () => {
-			console.log("post insert?")
-			console.log(messageObject);
+		db.collection("messages").insert(messageObject, (result) => {
+			
 		});
 		console.log("inserted:");
 		console.log(messageObject);
@@ -88,23 +84,20 @@ function cullInactiveUsers() {
 	sendActiveUserList();
 	//timeSinceLastCull = Date.now();
 }
-
 cullInactiveUsers();
 
 wss.on('connection', function connection(ws) {
-
-	// Store user names with a connection id
-	// Maybe wait until ws.on('message') in case a user name has not been assigned
+	
 	ws.on('message', function message(message) {
 		message = JSON.parse(message);
 
 		if (message.isPing) { 
 			handleUserRegistry(message.userName, ws);
-			//console.log("got a ping from " + message.userName);
 
 		} else if (message.isConnection) {
 			sendActiveUserList();
 
+		// Regular messages.
 		} else {
 			handleUserRegistry(message.author, ws);
 			let messageObject = {};
@@ -112,27 +105,34 @@ wss.on('connection', function connection(ws) {
 			messageObject.newMessage = message;
 			saveChatMessage(message);
 
-			// TODO
-			// Private messages totally untested. Gotta build the new tabs first.
-			if (message.conversationType === "private") {
-				wss.clients.forEach( (client) => {
-					// Client in wss's storage equals one of our stored users
-					activeUsersObject.forEach( (userObject) => {
-						if (client === userObject.client) {
-							client.send(JSON.stringify(messageObject));
-						}
-					})
-				})
-			} else if (message.conversationType === "public") {
+			if (message.conversationType === "public") {
 				wss.clients.forEach(function each(client) {
 					if ( client.readyState === WebSocket.OPEN) {
 						  client.send(JSON.stringify(messageObject));		
 					}
 				});
-	
-			} 
+			}
+			else if (message.conversationType === "private") {
+				// wss.clients.forEach( (client) => {
+				// 	// Client in wss's storage equals one of our stored users
+				// 	// for (var userObject in activeUsersObject) {
+				// 	// 	if (client === userObject.client) {
+				// 	// 		//client.send(JSON.stringify(messageObject));
+				// 	// 	}
+				// 	// }
+				// })
+
+				// Totally insecure:
+				wss.clients.forEach(function each(client) {
+					if ( client.readyState === WebSocket.OPEN) {
+						  client.send(JSON.stringify(messageObject));		
+					}
+				});
+			}
+
 		}
 	})
+	
 	ws.on('close', function() {
 		
 	})

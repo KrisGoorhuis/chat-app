@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import {Header} from './components/header.js';
 import {SideBar} from './components/sidebar/sidebar-main.js';
-import {ChatWindow} from './components/chat-window/chat-window-main.js'
+import {ChatWindow} from './components/chat-window/chat-window-main.js';
 
 
 export class App extends React.Component {
@@ -13,17 +13,29 @@ export class App extends React.Component {
 
         this.openConversationTab = this.openConversationTab.bind(this);
         this.closeConversationTab = this.closeConversationTab.bind(this);
-
         this.ws = new WebSocket( location.origin.replace(/^http/, 'ws') || 'ws://localhost:3000' );
+        this.state = {
+            messages: [],
+            messagesLoaded: false,
+            activeUsers: ["Checking..."],
+            currentUser: "( Fetching... )",
+            privateConversationsArray: [],
+            privateConversationsObjects: {},
+            conversationTabs: []
+        }  
 
-        if (localStorage.getItem("userName")) {
-            this.state = {
-                currentUser: localStorage.getItem("userName")
-            }
-        }
+        fetch('/fetchChatHistory')
+            .then( (response) => {
+                return response.json();
+            })
+            .then( (response) => {
+                this.setState({
+                    messages: response.messages,
+                    messagesLoaded: true
+                });
+            });
 
         this.ws.onopen = () => {
-
              // Keeps the socket open and keeps us on the active user list.
              let sendPing = () => {
                 this.ws.send(JSON.stringify({
@@ -35,54 +47,95 @@ export class App extends React.Component {
                 }, 5000);
             };
             
-            if (localStorage.getItem("userName")) {
-                this.ws.send( JSON.stringify({
-                    "isConnection": true,
-                    "userName": localStorage.getItem("userName")
-                }));
-                this.setState({
-                    currentUser: localStorage.getItem("userName")
+            // Get all conversations that have
+            // Returns an object containing the conversations as items.
+            let getPrivateConversationsHistory = (userName) => {
+                fetch('/getPrivateConversationsHistory',
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    method: "POST",
+                    body: JSON.stringify({"userName": userName})
                 })
-                sendPing();
+                .then( (response) => {
+                    return response.json();
+                })
+                .then( (response) => {
+                    let newArray = this.state.privateConversationsArray;
+                    let newSideList = Object.keys(response);
+                    console.log(Object.keys(response));
+                    
+                    //TODO: get this into a state thing
+                    console.log("response");
+                    console.log(response);
+                    this.setState({
+                        privateConversationsObjects: response,
+                        privateConversationsArray: newSideList
+                    })
+                })
             }
-            
-            if (!localStorage.getItem("userName")) {
-                this.setState({
-                    currentUser: "( Generating... )"
-                })
-                
-                // Get a new user name from the server and save it client side.
-                let xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = () => {
-                    if ( xhr.readyState == 4 && xhr.status == 200 )  {
-                        let newUserName = xhr.responseText;
+
+            let getAndSaveNewUserName = () => {
+                return new Promise( resolve => {
+                    fetch('getAName')
+                    .then( (response ) => {
+                        return response.text();
+                    })
+                    .then ( (name) => {
                         this.ws.send(JSON.stringify(
                             {
                                 "conversationId": "public",
-                                "author": newUserName,
+                                "author": name,
                                 "timestamp": new Date(),
-                                "message": "( - joined the room - )",
+                                "message": "( - claiming name server side - )",
                             }
                         ));
-                        console.log("Setting name to " + newUserName);
-                        localStorage.setItem('userName', newUserName);
-
+                        console.log("Setting name to " + name);
+                        localStorage.setItem('userName', name);
+    
                         this.setState({
-                            currentUser: newUserName
+                            currentUser: name
                         });
-                        sendPing();
-                    }
-                }
-                xhr.open("GET", '/getAName');
-                xhr.setRequestHeader("Content-Type", "application/json");
-                xhr.send();              
+                        resolve;
+                    });
+                });
+            };
+
+            // Have name
+            // Register us as active and get the user list back
+            let userName = localStorage.getItem("userName");
+            if (userName) {
+
+                // Gets the user list back
+                this.ws.send( JSON.stringify({
+                    "isConnection": true,
+                    "userName": userName
+                }));
+                this.setState({
+                    currentUser: userName
+                })
+                getPrivateConversationsHistory(userName);
+                sendPing();
             }
+            
+            // No name yet
+            if (!userName) {
+                this.setState({
+                    currentUser: "( Generating... )"
+                })
+                getAndSaveNewUserName()
+                .then( () => {
+                    sendPing();
+                }) 
+            }
+            
         }
+
         
         this.ws.onmessage = (message) => {
             let parsedMessage = JSON.parse(message.data)
-            console.log("Message received: ")
-            console.log(parsedMessage);
             if (parsedMessage.type === "users") {
 
                 this.setState({
@@ -90,50 +143,87 @@ export class App extends React.Component {
                 })
             }
 
-            if (parsedMessage.type === "message") {
+            if (parsedMessage.type === "message" && parsedMessage.newMessage.conversationType === "public") {
                 let newMessages = this.state.messages;
                 newMessages.push(parsedMessage.newMessage);
-    
+                console.log(parsedMessage);
                 this.setState({
                     messages: newMessages
                 })
             }
-        }
+            if (parsedMessage.type === "message" && parsedMessage.newMessage.conversationType === "private") {
+                let currentUser = this.state.currentUser;
+                let messageAuthor = parsedMessage.newMessage.author;
+                let messageRecipient = parsedMessage.newMessage.recipient;
+                let newConversations = this.state.privateConversationsObjects;
+                let newPrivateArray = this.state.privateConversationsArray;
 
-        let xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = () => {
-            if ( xhr.readyState == 4 && xhr.status == 200 )  {
+
+                if (currentUser === messageAuthor) {
+                    if (!newConversations[messageRecipient]) {
+                        newConversations[messageRecipient] = [];
+                    }
+                    newConversations[messageRecipient].push(parsedMessage.newMessage);
+                    newPrivateArray.push(message.recipient);
+                } 
+                else if (currentUser === messageRecipient) { // Talking to ourselves.
+                    if (!newConversations[messageAuthor]) {   // At this point, it would have been easier to not let you talk to yourself.
+                        newConversations[messageAuthor] = [];
+                    }
+                    newConversations[messageAuthor].push(parsedMessage.newMessage);
+                    newPrivateArray.push(messageAuthor);
+                }
+
+
                 this.setState({
-                    messages: JSON.parse(xhr.response).messages,
-                    messagesLoaded: true
-                })
-                console.log("received messages via xhr");
+                    privateConversationsObjects: newConversations,
+                    privateConversationsArray: newPrivateArray
+                });
             }
         }
-        xhr.open("GET", '/fetchChatHistory');
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send();
-        
-        this.state = {
-            messages: [],
-            messagesLoaded: false,
-            activeUsers: ["Checking..."],
-            currentUser: "( Fetching... )",
-            privateConversationsList: ["Test one", "Test two"],
-            conversationTabs: ["Just test one"]
-        }  
+
     }
 
-    openConversationTab(name) {
-        let newTabList = this.state.conversationTabs;
-        newTabList.splice(newTabList.indexOf(name), 1);
+    openConversationTab(partnerName, isResumingConversation) {
+        let newSideList = this.state.privateConversationsArray;
+        let newTopTabs = this.state.conversationTabs;
+        let updateState = false;
+
+        if (newTopTabs.indexOf(partnerName) === -1) {
+            newTopTabs.push(partnerName);
+            updateState = true;
+        } else {
+            // TODO: Make the tab flash?
+        }
+
+        if (newSideList.indexOf(partnerName) === -1) {
+            newSideList.push(partnerName);
+            updateState = true;
+        }
+
+        if (updateState === true) {
+            this.setState({
+                privateConversationsArray: newSideList,
+                conversationTabs: newTopTabs
+            });
+        }
+    }
+
+    closeConversationTab(recipient) {
+        let newTopTabs = this.state.conversationTabs;
+        newTopTabs.splice(newTopTabs.indexOf(name), 1);
+        // TODO:
+        // Check to see if the tab has any messages - remove the name from the sidebar if it doesn't. Otherwise it stays.
+        // if (tabObject.messages.length === 0) {
+        //     let newConversationsList = this.state.privateConversationsObjects;
+        //     newConversationsList.splice(newconversationObjects.indexOf(name), 1);
+        //     this.setState({
+        //         privateConversationsObjects: newConversationsList
+        //     })
+        // }
         this.setState({
-            conversationTabs: newTabList
+            conversationTabs: newTopTabs
         });
-    };
-
-    closeConversationTab() {
-
     }
    
 
@@ -147,7 +237,8 @@ export class App extends React.Component {
                         ws={this.ws} 
                         currentUser={this.state.currentUser} 
                         activeUsers={this.state.activeUsers}
-                        privateConversationsList={this.state.privateConversationsList}
+                        privateConversationsArray={this.state.privateConversationsArray}
+                        privateConversationsObjects={this.state.privateConversationsObjects}
                         openConversationTab={this.openConversationTab}
                         closeConversationTab={this.closeConversationTab}
                     />
@@ -156,7 +247,9 @@ export class App extends React.Component {
                         currentUser={this.state.currentUser} 
                         messages={this.state.messages} 
                         messagesLoaded={this.state.messagesLoaded} 
-                        privateConversationsList={this.state.privateConversationsList}
+                        privateConversationsArray={this.state.privateConversationsArray}
+                        privateConversationsObjects={this.state.privateConversationsObjects}
+                        conversationTabs={this.state.conversationTabs}
                         openConversationTab={this.openConversationTab}
                         closeConversationTab={this.closeConversationTab}
                     />

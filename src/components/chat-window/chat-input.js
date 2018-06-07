@@ -7,13 +7,15 @@ export class ChatInput extends React.Component {
     constructor(props) {
         super(props);
         
-        this.ws = this.props.ws;   
+        this.ws = this.props.ws; 
+        console.log(this.ws);  
     }
 
     submitMessage(element) {
         element.preventDefault(); // Prevents page from refreshing on submit.
         let sendingPublicMessage = true;
         
+        // Public messages
         if (this.props.currentChatWindow === "public") {
             this.ws.send(JSON.stringify(
                     {
@@ -22,22 +24,22 @@ export class ChatInput extends React.Component {
                         "timestamp": new Date(),
                         "message": this.chatInputElement.value,
                     }
-                ));        
-        } else if (this.props.currentChatWindow === "private") {
-            this.ws.send(JSON.stringify(
-                {
-                    "conversationType": "private",
-                    "author": this.props.currentUser,
-                    //"recipient": TODO
-                    "timestamp": new Date(),
-                    "message": this.chatInputElement.value,
-                }
-            ));   
+                ));   
+                
+        // Private message
+        } else { 
+            console.log("Sending to recipient: " + this.props.currentChatWindow);
+            let messageObject = {
+                "conversationType": "private",
+                "author": this.props.currentUser,
+                "recipient": this.props.currentChatWindow,
+                "timestamp": new Date(),
+                "message": this.chatInputElement.value,
+                "ws": this.ws
+            }
+            console.log(messageObject);
+            this.ws.send(JSON.stringify(messageObject));   
         }
-
-        // if (currentChatWindow === "private") {
-        //      Send to the right user
-        // }
         
         this.chatInputElement.value = "";
     }
@@ -46,7 +48,13 @@ export class ChatInput extends React.Component {
 
         return (
             <form onSubmit={ (element) => this.submitMessage(element) }>
-                <input id="chat-input" autoComplete="off" placeholder={this.props.currentUser ? this.props.currentUser + " says..." : "..."} ref={ (element) => { this.chatInputElement = element } }></input>
+                <input 
+                    id="chat-input" 
+                    autoComplete="off" 
+                    placeholder={this.props.currentUser ? this.props.currentUser + " says..." : "..."} 
+                    ref={ (element) => { this.chatInputElement = element } }
+                >
+                </input>
             </form>
         )
     }

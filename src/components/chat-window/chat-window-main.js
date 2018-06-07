@@ -31,16 +31,20 @@ export class ChatWindow extends React.Component {
                 <ChatLog 
                     messagesLoaded={this.props.messagesLoaded} 
                     messages={this.props.messages} 
+                    currentUser={this.props.currentUser}
                     currentChatWindow={this.state.currentChatWindow} 
-                    privateConversationsList={this.props.privateConversationsList}
-                    openConversationTab={this.openConversationTab}
-                    closeConversationTab={this.closeConversationTab}
+                    selectChatWindow={this.selectChatWindow}
+                    privateConversationsArray={this.props.privateConversationsArray}
+                    privateConversationsObjects={this.props.privateConversationsObjects}
+                    conversationTabs={this.props.conversationTabs}
+                    openConversationTab={this.props.openConversationTab}
+                    closeConversationTab={this.props.closeConversationTab}
                  />
                 <ChatInput 
                     ws={this.props.ws} 
                     currentUser={this.props.currentUser} 
                     currentChatWindow={this.state.currentChatWindow} 
-                />
+                 />
             </div>
             
         )

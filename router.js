@@ -1,10 +1,11 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const http = require('http');
+const jsonParser = bodyParser.json();
+// const http = require('http');
 const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
 
 const nameComponents = require('./nameComponents.js');
 
@@ -73,6 +74,7 @@ module.exports = function(app) {
                 if (error) {
                     console.log(error);
                 }
+                // Find all unique user names, pass them to name generator as things it can't return.
                 collection.distinct("author", (error, existingNames) => {
                     if (error) {
                         console.log(error);
@@ -95,11 +97,12 @@ module.exports = function(app) {
             if (error) {
                 console.log(error);
             }
-    
             let db = client.db("chat");
     
+
+            // All public stuff            console.log(request);
             db.collection("messages", (error, collection) => {
-                collection.find({"conversationId": "public"}).toArray( (error, items) => {
+                collection.find({"conversationType": "public"}).toArray( (error, items) => {
                     let responseObject = {};
                     responseObject.type = "messages";                    
                     responseObject.messages = items;
@@ -110,28 +113,79 @@ module.exports = function(app) {
     
     });
 
+    // Returns an object containing all the conversations as items.
     
-// app.post('/postGeneralChatMessage', (request, response) => {	
-// 	MongoClient.connect(mongoAddress, (error, client) => {
-// 		if (error) {
-// 			console.log(error);
-// 		}
-// 		let db = client.db("chat");
+    app.post('/getPrivateConversationsHistory', jsonParser, (request, response) => {
+        MongoClient.connect(mongoAddress, (error, client) => {
+            console.log("Fetching history");
+            if (error) {
+                console.log(error);
+            }
+            let db = client.db("chat");
+    
+            db.collection("messages", (error, collection) => {
+                let currentUser = request.body.userName;
+                let returnObject = {};
+                collection.find({
+                    $and: [
+                        {"conversationType": "private"},
+                        {
+                            $or: [
+                                {"author": currentUser},
+                                {"recipient": currentUser}
+                            ]
+                        }
+                    ]
+                }).toArray( (error, itemsArray) => {
+                    // We're making this:
+                    // {
+                    //     recipientOne: [
+                    //         {message object},
+                    //         {message object},
+                    //     ],                   
+                    //     recipientTwo: [
+                    //         ...
+                    //     ]
+                    // }
+                    itemsArray.forEach(function(item) {
+                        console.log("item");
+                        console.log(item);
 
+                        // Talking to ourself. 
+                        if (item.author === item.recipient) {
+                            if (!returnObject.hasOwnProperty(currentUser)) {    // Message array doesn't exist. Create it.
+                                returnObject[currentUser] = [item];
+                            } 
+                            else {                                              // Message array exists. Add to it.
+                                returnObject[currentUser].push(item);
+                            }
+                        } 
+                        
+                        // We are talking to someone else.
+                        else if (item.author === currentUser) {
+                            if (!returnObject.hasOwnProperty(item.recipient)) {
+                                returnObject[item.recipient] = [item];
+                            } else {
+                                returnObject[item.recipient].push(item);
+                            }
+                        }
 
-// 		db.collection("messages").insert(
-// 			{
-// 				"conversationId": request.body.conversationId,
-// 				"author": request.body.author,
-// 				"timestamp": request.body.timestamp,
-// 				"message": request.body.message
-// 			}
-		
-// 		);
-// 		response.send();
-// 		console.log(request.body);
-// 	})
-// });
+                        else if (item.recipient === currentUser) {
+                            if (!returnObject.hasOwnProperty(item.author)) {
+                                returnObject[item.author] = [item];
+                            } else {
+                                returnObject[item.author].push(item);
+                            }
+                        }
+                    });
+                    console.log("return object");
+                    console.log(returnObject);
+                    response.send(JSON.stringify(returnObject));
+                });
+            });           
+        });
+    })
+
 
 
 }

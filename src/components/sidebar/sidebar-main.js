@@ -27,8 +27,9 @@ export class SideBar extends React.Component {
                  />
                 <PrivateConversationsList 
                     ws={this.props.ws} 
-                    privateConversationsList={this.props.privateConversationsList} 
-                    openConversationTab={this.openConversationTab}
+                    privateConversationsArray={this.props.privateConversationsArray}
+                    privateConversationsObjects={this.props.privateConversationsObjects} 
+                    openConversationTab={this.props.openConversationTab}
                 />
             </div>
         )
