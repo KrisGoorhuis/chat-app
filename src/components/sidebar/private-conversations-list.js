@@ -25,7 +25,7 @@ export class PrivateConversationsList extends React.Component {
                     { 
                         conversations.length > 0 &&
                         conversations.map( (user, index) => {
-                            return <div onDoubleClick={ () => this.props.openConversationTab(user) } className="name" key={user + " " + index}> {user} </div>
+                            return <div onDoubleClick={ () => this.props.openConversationTab(user, false) } className="name" key={user + " " + index}> {user} </div>
                         })
                     }
                 </div>

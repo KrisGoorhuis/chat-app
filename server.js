@@ -93,6 +93,8 @@ wss.on('connection', function connection(ws) {
 
 		if (message.isPing) { 
 			handleUserRegistry(message.userName, ws);
+			console.log("ping from")
+			console.log(message.userName)
 
 		} else if (message.isConnection) {
 			sendActiveUserList();

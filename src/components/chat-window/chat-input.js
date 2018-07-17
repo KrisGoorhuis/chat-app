@@ -34,8 +34,7 @@ export class ChatInput extends React.Component {
                 "author": this.props.currentUser,
                 "recipient": this.props.currentChatWindow,
                 "timestamp": new Date(),
-                "message": this.chatInputElement.value,
-                "ws": this.ws
+                "message": this.chatInputElement.value
             }
             console.log(messageObject);
             this.ws.send(JSON.stringify(messageObject));   

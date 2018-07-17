@@ -53,75 +53,70 @@ export class ChatLog extends React.Component {
             currentUser
         } = this.props;
 
-
         return (
-            <div id="container-chat-log">
-
+            <div id="container-chat">
                 {/* Tabs at the top */}
-                <div id="conversation-tabs">
+                <div id="conversation-tabs-container">
                     <div 
                         onClick={ () => { selectChatWindow("public") } } 
-                        className={currentChatWindow === "public" ? "active name" : "name"}
+                        className={currentChatWindow === "public" ? "active name conversationTab" : "inactive name conversationTab"}
                     >
-                        Public
+                        <p>Public</p>
                     </div>
-
+            
                     {
                         conversationTabs &&
-                        conversationTabs.map( ( recipient, index) => {
-                            return <div>
+                        conversationTabs.map( ( partnerObject, index) => {
+                            return <div key={partnerObject.name} className="conversationTab" id={"tab-" + partnerObject.name}>
                                 <div 
-                                    onClick={ () => { selectChatWindow(recipient) } } 
-                                    className={recipient === currentChatWindow ? "active name" : "name"} 
-                                    key={recipient}
+                                    onClick={ () => { selectChatWindow(partnerObject.name) } } 
+                                    className={partnerObject.name === currentChatWindow ? "active name" : "inactive name"} 
                                 > 
-                                    {recipient}
+                                    <p>{partnerObject.name} {partnerObject.alert === true ? "!" : ""}</p>
                                 </div>
-                                <div className="closeButton" onClick={ () => this.props.closeConversationTab(recipient) }> X </div>
+                                <div className="closeButton" onClick={ () => this.props.closeConversationTab(partnerObject.name) }> X </div>
                             </div>
                         })
                     }
-
                 </div>
+                <div id="container-chat-log">
+                    {/* Body of text for the selected tab */}
+                    <div id="chat-log" ref="chatLog">
+                        {
+                            !messagesLoaded &&
+                            <div>Fetching messages...{messages}</div>
+                        }
 
+                        {/* Public Messages */}
+                        {
+                            (messagesLoaded && currentChatWindow === "public") &&
+                            messages.map( (obj, index) => {
+                                return <div 
+                                    onDoubleClick={ () => {this.props.openConversationTab(obj.author, true)} }
+                                    key={obj.timestamp}
+                                >
+                                    {this.pareTimestamp(obj.timestamp)} - <span className="name">{obj.author}</span>: {obj.message}
+                                </div>
+                            })
+                        }    
 
-
-                {/* Body of text for the selected tab */}
-                <div id="chat-log" ref="chatLog">
-                    {
-                        !messagesLoaded &&
-                        <div>Fetching messages...{messages}</div>
-                    }
-
-                    {/* Public Messages */}
-                    {
-                        (messagesLoaded && currentChatWindow === "public") &&
-                        messages.map( (obj, index) => {
-                            return <div 
-                                onDoubleClick={ () => this.props.openConversationTab(obj.author) }
-                                key={obj.timestamp}
-                            >
-                                {this.pareTimestamp(obj.timestamp)} - <span className="name">{obj.author}</span>: {obj.message}
-                            </div>
-                        })
-                    }    
-
-                    {/* Private Messages */}
-                    {
-                        (messagesLoaded && currentChatWindow !== "public" && privateConversationsObjects[currentChatWindow]) &&
-                        privateConversationsObjects[currentChatWindow].map( (obj, index) => {
-                            if (currentChatWindow === obj.recipient || obj.author) {
-                                // obj.map( (message, index) => {
-                                    return <div key={index}>
-                                        {this.pareTimestamp(obj.timestamp)} - <span className="name">{currentChatWindow === obj.author ? "You" : obj.author}</span>: {obj.message}
-                                    </div>
-                                // })
-                            }
-                        })
-                    }   
-                </div>  
-               
-            </div>       
+                        {/* Private Messages */}
+                        {
+                            (messagesLoaded && currentChatWindow !== "public" && privateConversationsObjects[currentChatWindow]) &&
+                            privateConversationsObjects[currentChatWindow].map( (obj, index) => {
+                                if (currentChatWindow === obj.recipient || obj.author) {
+                                    // obj.map( (message, index) => {
+                                        return <div key={index}>
+                                            {this.pareTimestamp(obj.timestamp)} - <span className="name">{currentChatWindow === currentUser ? "You" : obj.author}</span>: {obj.message}
+                                        </div>
+                                    // })
+                                }
+                            })
+                        }   
+                    </div>  
+                
+                </div> 
+            </div>      
         )
     }
 }

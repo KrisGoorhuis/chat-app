@@ -10,18 +10,11 @@ export class ChatWindow extends React.Component {
     constructor(props) {
         super(props);
         
-        this.state = {
-            currentChatWindow: "public"
-        }
-
-        this.selectChatWindow = this.selectChatWindow.bind(this);
+        
+  
     }
 
-    selectChatWindow(window) {
-        this.setState({
-            currentChatWindow: window
-        })
-    }
+    
 
     render() {
 
@@ -32,8 +25,8 @@ export class ChatWindow extends React.Component {
                     messagesLoaded={this.props.messagesLoaded} 
                     messages={this.props.messages} 
                     currentUser={this.props.currentUser}
-                    currentChatWindow={this.state.currentChatWindow} 
-                    selectChatWindow={this.selectChatWindow}
+                    currentChatWindow={this.props.currentChatWindow} 
+                    selectChatWindow={this.props.selectChatWindow}
                     privateConversationsArray={this.props.privateConversationsArray}
                     privateConversationsObjects={this.props.privateConversationsObjects}
                     conversationTabs={this.props.conversationTabs}
@@ -43,7 +36,7 @@ export class ChatWindow extends React.Component {
                 <ChatInput 
                     ws={this.props.ws} 
                     currentUser={this.props.currentUser} 
-                    currentChatWindow={this.state.currentChatWindow} 
+                    currentChatWindow={this.props.currentChatWindow} 
                  />
             </div>
             

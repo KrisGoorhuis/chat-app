@@ -8,12 +8,7 @@ $fa-font-path: "~font-awesome/fonts";
 
 $app-height: 600px;
 
-.name {
-    cursor: pointer;
-    &:hover {
-        color: blue;
-    }
-}
+
 
 #container-header {
     padding-top: 10px;
@@ -24,6 +19,13 @@ $app-height: 600px;
     padding: 0px;
     display: flex;
     height: $app-height;
+}
+
+.name {
+    cursor: pointer;
+    &:hover {
+        color: blue;
+    }
 }
 
 #container-sidebar {
@@ -67,6 +69,8 @@ $app-height: 600px;
     #container-sidebar-private-conversations {
         height: $private-conversations-height;
         #private-conversations-list { 
+            display: flex;
+            flex-direction: column;
             height: $app-height - $all-users-height - $h4-height*2;
             padding-left: 15px;
             overflow: scroll;
@@ -83,24 +87,47 @@ $app-height: 600px;
     justify-content: space-between;
     max-height: 100%;
 
+    #conversation-tabs-container {
+        height: 35px;
+        display: flex;
+        width: 100%;
+        // border-bottom: 1px solid grey;
+        overflow-x: auto;
+        overflow-y: hidden;
+        margin-bottom: 10px;
+        .active {
+            background-color: palegoldenrod;
+        }
+        .inactive {
+            background-color: lightgray;
+        }
+        // div {
+            
+        // }
+    }
+    .conversationTab{
+        height: 35px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        p {
+            padding-left: 5px;
+            padding-right: 5px;
+            margin: 0px;
+            height: 35px;
+            line-height: 35px;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+    
     #container-chat-log {
         padding: 10px;
     	overflow-y: auto;
         overflow-x: hidden;
-        #conversation-tabs {
-            display: flex;
-            width: 100%;
-            // border-bottom: 1px solid grey;
-            overflow-x: auto;
-            overflow-y: hidden;
-            margin-bottom: 10px;
-            .active {
-                background-color: rgba(240, 240, 240, 1);
-            }
-            div {
-                padding: 5px;
-            }
-        }
+        max-height: 530px;
     }
 
     form {

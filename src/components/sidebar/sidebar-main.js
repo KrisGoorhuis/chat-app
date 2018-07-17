@@ -8,8 +8,6 @@ export class SideBar extends React.Component {
     
     constructor(props) {
         super(props);
-
-        this.ws = this.props.ws;
         
     }
     
@@ -23,7 +21,7 @@ export class SideBar extends React.Component {
                 <ActiveUsersList 
                     ws={this.props.ws}
                     activeUsers={this.props.activeUsers}
-                    openConversationTab={this.openConversationTab}
+                    openConversationTab={this.props.openConversationTab}
                  />
                 <PrivateConversationsList 
                     ws={this.props.ws} 

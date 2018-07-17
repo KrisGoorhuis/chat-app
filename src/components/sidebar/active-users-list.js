@@ -17,8 +17,9 @@ export class ActiveUsersList extends React.Component {
                 <h4>Active Users</h4>
                 <div id="all-users-list">
                     { 
-                        this.props.activeUsers.map( (item) => {
-                            return <div className="name" key={item}>{item}</div>
+                        this.props.activeUsers.map( (name) => {
+                            return <div onDoubleClick={ () => {this.props.openConversationTab(name)} } className="name" key={name}>{
+                            name === "( Generating... )" ? " " : name}</div>
                         } )
                     }
                 </div>
