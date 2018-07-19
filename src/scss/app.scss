@@ -24,7 +24,7 @@ $app-height: 600px;
 .name {
     cursor: pointer;
     &:hover {
-        color: blue;
+        color: darkcyan;
     }
 }
 
@@ -111,6 +111,11 @@ $app-height: 600px;
         flex-direction: row;
         align-items: center;
         justify-content: center;
+        .tab-container {
+            display: flex;
+            flex-direction: row;
+            cursor: pointer;
+        }
         p {
             padding-left: 5px;
             padding-right: 5px;
@@ -120,6 +125,19 @@ $app-height: 600px;
             flex-direction: row;
             align-items: center;
             justify-content: center;
+            font-size: 15px;
+            &:hover {
+                color: darkcyan;
+            }
+        }
+        .closeButton {
+            padding-right: 4px;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            &:hover {
+                color: darkorange;
+            }
         }
     }
     

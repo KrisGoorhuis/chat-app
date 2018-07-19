@@ -136,7 +136,7 @@ export class App extends React.Component {
         }
         sendPing();
             
-        }
+    }
 
         
         this.ws.onmessage = (message) => {
@@ -229,14 +229,15 @@ export class App extends React.Component {
 
         let newSideList = this.state.privateConversationsArray;
         let newTopTabs = this.state.conversationTabs;
-        let updateState = false;
+        // let updateState = false;
         let shouldAddTab = true;
 
         newTopTabs.map( (obj) => {
-            if (!obj.hasOwnProperty(partnerName)) {
+            if (obj.name === partnerName) {
                 shouldAddTab = false;
             }
         });
+
         if (shouldAddTab) {
             newTopTabs.push({"name": partnerName, "alert": false})
         }
@@ -247,7 +248,7 @@ export class App extends React.Component {
         if (newSideList !== this.state.privateConversationsArray || newTopTabs !== this.state.conversationTabs) {
             updateState = true;
         }
-
+        console.log(newTopTabs);
         // debugger;
         // if (updateState === true && flipTo === true) {
         //     console.log("firsy blah")

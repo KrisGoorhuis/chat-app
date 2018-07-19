@@ -70,11 +70,11 @@ export class ChatLog extends React.Component {
                             return <div key={partnerObject.name} className="conversationTab" id={"tab-" + partnerObject.name}>
                                 <div 
                                     onClick={ () => { selectChatWindow(partnerObject.name) } } 
-                                    className={partnerObject.name === currentChatWindow ? "active name" : "inactive name"} 
+                                    className={partnerObject.name === currentChatWindow ? "active tab-container" : "inactive tab-container"} 
                                 > 
                                     <p>{partnerObject.name} {partnerObject.alert === true ? "!" : ""}</p>
+                                    <div className="closeButton" onClick={ () => this.props.closeConversationTab(partnerObject.name) }> X </div>
                                 </div>
-                                <div className="closeButton" onClick={ () => this.props.closeConversationTab(partnerObject.name) }> X </div>
                             </div>
                         })
                     }
