@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // Child of sidebar-main.js
-export class PrivateConversationsList extends React.Component {
+export class PrivateConversationsSideList extends React.Component {
     
     constructor(props) {
         super(props);
@@ -11,7 +11,7 @@ export class PrivateConversationsList extends React.Component {
     }
 
     render() {
-        const conversations = this.props.privateConversationsArray;
+        const conversations = this.props.privateConversationsSideList;
 
         return (
             <div id="container-sidebar-private-conversations" className="">

@@ -23,7 +23,8 @@ export class App extends React.Component {
             activeUsers: ["Checking..."],
             currentUser: "( Fetching... )",
             currentChatWindow: "public",
-            privateConversationsArray: [],
+            newPublicMessageAlert: false,
+            privateConversationsSideList: [],
             privateConversationsObjects: {},
             conversationTabs: []
         }  
@@ -72,7 +73,7 @@ export class App extends React.Component {
                     return response.json();
                 })
                 .then( (response) => {
-                    let newArray = this.state.privateConversationsArray;
+                    let newArray = this.state.privateConversationsSideList;
                     let newSideList = Object.keys(response);
                     
                     //TODO: get this into a state thing
@@ -80,7 +81,7 @@ export class App extends React.Component {
                     // console.log(response);
                     this.setState({
                         privateConversationsObjects: response,
-                        privateConversationsArray: newSideList
+                        privateConversationsSideList: newSideList
                     })
                 })
             }
@@ -141,7 +142,7 @@ export class App extends React.Component {
         
         this.ws.onmessage = (message) => {
             let parsedMessage = JSON.parse(message.data)
-
+            
             // Update user list
             if (parsedMessage.type === "users") {
                 this.setState({
@@ -150,14 +151,28 @@ export class App extends React.Component {
             }
 
             // Public message
+            // Flag for alert
             if (parsedMessage.type === "message" && parsedMessage.newMessage.conversationType === "public") {
                 let newMessages = this.state.messages;
-                newMessages.push(parsedMessage.newMessage);
-                console.log(parsedMessage);
-                this.setState({
-                    messages: newMessages
-                })
-            }
+
+                if (this.state.currentChatWindow !== "public") {
+                    newMessages.push(parsedMessage.newMessage);
+        
+                    this.setState({
+                        messages: newMessages,
+                        newPublicMessageAlert: true
+                    })
+                // Don't flag for alert
+                } else {
+                    let newMessages = this.state.messages;
+                    newMessages.push(parsedMessage.newMessage);
+                    this.setState({
+                        messages: newMessages
+                    })
+                }
+            } 
+            
+
 
             // Private message
             if (parsedMessage.type === "message" && parsedMessage.newMessage.conversationType === "private") {
@@ -165,7 +180,7 @@ export class App extends React.Component {
                 let messageAuthor = parsedMessage.newMessage.author;
                 let messageRecipient = parsedMessage.newMessage.recipient;
                 let newConversations = this.state.privateConversationsObjects;
-                let newPrivateArray = this.state.privateConversationsArray;
+                let newPrivateSideList = this.state.privateConversationsSideList;
 
                 // Determining which conversation to add a message to
                 if (currentUser === messageAuthor) {
@@ -173,38 +188,41 @@ export class App extends React.Component {
                         newConversations[messageRecipient] = [];
                     }
                     newConversations[messageRecipient].push(parsedMessage.newMessage);
-                    newPrivateArray.push(message.recipient);
+                    if (newPrivateSideList.indexOf(messageAuthor) === -1) {
+                        newPrivateSideList.push(message.recipient);
+                    }
                 } 
                 else if (currentUser === messageRecipient) { // Talking to ourselves.
                     if (!newConversations[messageAuthor]) {   // At this point, it would have been easier to not let you talk to yourself.
                         newConversations[messageAuthor] = [];
                     }
                     newConversations[messageAuthor].push(parsedMessage.newMessage);
-                    newPrivateArray.push(messageAuthor);
+                    if (newPrivateSideList.indexOf(messageAuthor) === -1) {
+                        newPrivateSideList.push(message.recipient);
+                    }
                 }
 
+                
+
                 // Determining whether to alert the user to a new message
-                // TODO: this doesn't seem to be triggering. Also there is a delay on private messages.
                 if (this.state.currentChatWindow !== messageAuthor) {
                     let tabsWithAlert = this.state.conversationTabs;
                     this.openConversationTab(messageAuthor);
-                    console.log("ran it anyway");
                     tabsWithAlert.map( (obj) => {
-                        if (obj.name === messageAuthor) {
-                            obj.alert = true;
+                        if (obj.name === messageAuthor && messageAuthor !== currentUser) {
+                            obj.newMessageAlert = true;
                         }
                     })
+                    console.log("setting private convo flag for " + messageAuthor)
                     this.setState({
                         conversationTabs: tabsWithAlert,
                         privateConversationsObjects: newConversations,
-                        privateConversationsArray: newPrivateArray
+                        privateConversationsSideList: newPrivateSideList
                     });
-                } 
-                
-                else {
+                } else {
                     this.setState({
                         privateConversationsObjects: newConversations,
-                        privateConversationsArray: newPrivateArray
+                        privateConversationsSideList: newPrivateSideList
                     });
                 }
 
@@ -227,7 +245,7 @@ export class App extends React.Component {
         // console.log(this.state.conversationTabs)
 
 
-        let newSideList = this.state.privateConversationsArray;
+        let newSideList = this.state.privateConversationsSideList;
         let newTopTabs = this.state.conversationTabs;
         // let updateState = false;
         let shouldAddTab = true;
@@ -239,13 +257,13 @@ export class App extends React.Component {
         });
 
         if (shouldAddTab) {
-            newTopTabs.push({"name": partnerName, "alert": false})
+            newTopTabs.push({"name": partnerName, "newMessageAlert": false})
         }
         if (newSideList.indexOf(partnerName) === -1) {
             newSideList.push(partnerName);
         }
 
-        if (newSideList !== this.state.privateConversationsArray || newTopTabs !== this.state.conversationTabs) {
+        if (newSideList !== this.state.privateConversationsSideList || newTopTabs !== this.state.conversationTabs) {
             updateState = true;
         }
         console.log(newTopTabs);
@@ -254,25 +272,25 @@ export class App extends React.Component {
         //     console.log("firsy blah")
         //     this.setState({
         //         currentChatWindow: partnerName,
-        //         privateConversationsArray: newSideList,
+        //         privateConversationsSideList: newSideList,
         //         conversationTabs: newTopTabs
         //     });
         // } else if (updateState === true) {
         //     console.log("second blah")
         //     this.setState({
-        //         privateConversationsArray: newSideList,
+        //         privateConversationsSideList: newSideList,
         //         conversationTabs: newTopTabs
         //     });
         // }
         if (flipTo === true) {
             this.setState({
                 currentChatWindow: partnerName,
-                privateConversationsArray: newSideList,
+                privateConversationsSideList: newSideList,
                 conversationTabs: newTopTabs
             });
         } else {
             this.setState({
-                privateConversationsArray: newSideList,
+                privateConversationsSideList: newSideList,
                 conversationTabs: newTopTabs
             });
         }
@@ -281,15 +299,28 @@ export class App extends React.Component {
     closeConversationTab(recipient) {
         let newTopTabs = this.state.conversationTabs;
         let nextWindow;
-        let newSideList = this.state.privateConversationsArray;
+        let newSideList = this.state.privateConversationsSideList;
+        let closedTabIndex;
 
-        newTopTabs.splice(newTopTabs.indexOf(name), 1);
+        newTopTabs.map( (obj, index) => {
+            if (obj.name === recipient) {
+                closedTabIndex = index
+            }
+        })
+        
+        newTopTabs.splice(closedTabIndex, 1);
+        console.log(newTopTabs.length)
+        console.log(closedTabIndex)
 
-        if (newTopTabs[newTopTabs.length - 1]) {
-            nextWindow = newTopTabs[newTopTabs.length - 1]
+        if (newTopTabs.length >= 1 && closedTabIndex !== 0) {
+            console.log("Changing to ") 
+            nextWindow = newTopTabs[closedTabIndex - 1].name
+            console.log(nextWindow)
         } else {
             nextWindow = "public"
         }
+        this.selectChatWindow(nextWindow);
+
 
         // No messages? Remove it from the side as well.
         if (!this.state.privateConversationsObjects[recipient]) {
@@ -298,27 +329,34 @@ export class App extends React.Component {
 
         this.setState({
             conversationTabs: newTopTabs,
-            currentChatWindow: nextWindow,
-            privateConversationsArray: newSideList
+            privateConversationsSideList: newSideList
         });
     }
 
     selectChatWindow(name) {
         let newConversationTabs = this.state.conversationTabs;
+        console.log(newConversationTabs)
+        console.log(name)
 
-        newConversationTabs.map( (obj, index) => {
-            if (obj.name === name) {
-                newConversationTabs[index].alertState = false;
-            }
-        })
-        // if (newConversationTabs[name].alertState === true) {
-        //     newConversationTabs[name].alertState = false;
-        // }
+        if (name === "public") {
+            this.setState({
+                newPublicMessageAlert: false,
+                currentChatWindow: name
+            })
+        } else {
+            newConversationTabs.map( (obj, index) => {
+                console.log(obj)
+                if (obj.name === name) {
+                    newConversationTabs[index].newMessageAlert = false;
+                }
+            })
+            this.setState({
+                conversationTabs: newConversationTabs,
+                currentChatWindow: name
+            })
+        }
+        
 
-        this.setState({
-            conversationTabs: newConversationTabs,
-            currentChatWindow: name
-        })
     }
    
     componentDidUpdate() {
@@ -336,7 +374,7 @@ export class App extends React.Component {
                         currentUser={this.state.currentUser} 
                         activeUsers={this.state.activeUsers}
                         currentChatWindow={this.state.currentChatWindow}
-                        privateConversationsArray={this.state.privateConversationsArray}
+                        privateConversationsSideList={this.state.privateConversationsSideList}
                         privateConversationsObjects={this.state.privateConversationsObjects}
                         openConversationTab={this.openConversationTab}
                         closeConversationTab={this.closeConversationTab}
@@ -347,8 +385,9 @@ export class App extends React.Component {
                         messages={this.state.messages} 
                         messagesLoaded={this.state.messagesLoaded} 
                         currentChatWindow={this.state.currentChatWindow}
+                        newPublicMessageAlert={this.state.newPublicMessageAlert}
                         selectChatWindow={this.selectChatWindow}
-                        privateConversationsArray={this.state.privateConversationsArray}
+                        privateConversationsSideList={this.state.privateConversationsSideList}
                         privateConversationsObjects={this.state.privateConversationsObjects}
                         conversationTabs={this.state.conversationTabs}
                         openConversationTab={this.openConversationTab}

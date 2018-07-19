@@ -26,8 +26,8 @@ export class ChatWindow extends React.Component {
                     messages={this.props.messages} 
                     currentUser={this.props.currentUser}
                     currentChatWindow={this.props.currentChatWindow} 
+                    newPublicMessageAlert={this.props.newPublicMessageAlert}
                     selectChatWindow={this.props.selectChatWindow}
-                    privateConversationsArray={this.props.privateConversationsArray}
                     privateConversationsObjects={this.props.privateConversationsObjects}
                     conversationTabs={this.props.conversationTabs}
                     openConversationTab={this.props.openConversationTab}

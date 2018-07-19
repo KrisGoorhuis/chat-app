@@ -45,8 +45,8 @@ export class ChatLog extends React.Component {
         const {
             messagesLoaded,
             messages,
+            newPublicMessageAlert,
             conversationTabs,
-            privateConversationsArray,
             privateConversationsObjects,
             selectChatWindow,
             currentChatWindow,
@@ -59,20 +59,31 @@ export class ChatLog extends React.Component {
                 <div id="conversation-tabs-container">
                     <div 
                         onClick={ () => { selectChatWindow("public") } } 
+                        id="public-tab"
                         className={currentChatWindow === "public" ? "active name conversationTab" : "inactive name conversationTab"}
                     >
                         <p>Public</p>
+                        {
+                            newPublicMessageAlert &&
+                            <span className='newMessageAlert'>  !</span>
+                        }
                     </div>
             
                     {
                         conversationTabs &&
-                        conversationTabs.map( ( partnerObject, index) => {
+                        conversationTabs.map( (partnerObject) => {
                             return <div key={partnerObject.name} className="conversationTab" id={"tab-" + partnerObject.name}>
                                 <div 
-                                    onClick={ () => { selectChatWindow(partnerObject.name) } } 
+                                     
                                     className={partnerObject.name === currentChatWindow ? "active tab-container" : "inactive tab-container"} 
                                 > 
-                                    <p>{partnerObject.name} {partnerObject.alert === true ? "!" : ""}</p>
+                                    <p onClick={ () => { selectChatWindow(partnerObject.name) } }>
+                                        {partnerObject.name} 
+                                        {
+                                            partnerObject.newMessageAlert &&
+                                            <span className='newMessageAlert'>  !</span>
+                                        }
+                                    </p>
                                     <div className="closeButton" onClick={ () => this.props.closeConversationTab(partnerObject.name) }> X </div>
                                 </div>
                             </div>

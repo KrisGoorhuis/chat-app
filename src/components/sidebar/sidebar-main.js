@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {ActiveUsersList} from './active-users-list.js';
-import {PrivateConversationsList} from './private-conversations-list.js';
+import {PrivateConversationsSideList} from './private-conversations-side-list.js';
 
 export class SideBar extends React.Component {
     
@@ -23,9 +23,9 @@ export class SideBar extends React.Component {
                     activeUsers={this.props.activeUsers}
                     openConversationTab={this.props.openConversationTab}
                  />
-                <PrivateConversationsList 
+                <PrivateConversationsSideList 
                     ws={this.props.ws} 
-                    privateConversationsArray={this.props.privateConversationsArray}
+                    privateConversationsSideList={this.props.privateConversationsSideList}
                     privateConversationsObjects={this.props.privateConversationsObjects} 
                     openConversationTab={this.props.openConversationTab}
                 />

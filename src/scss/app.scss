@@ -86,6 +86,7 @@ $app-height: 600px;
     flex-direction: column;
     justify-content: space-between;
     max-height: 100%;
+    
 
     #conversation-tabs-container {
         height: 35px;
@@ -101,9 +102,12 @@ $app-height: 600px;
         .inactive {
             background-color: lightgray;
         }
-        // div {
-            
-        // }
+        .newMessageAlert {
+            color: orangered;
+        }
+    }
+    #public-tab {
+        padding-right: 5px;
     }
     .conversationTab{
         height: 35px;

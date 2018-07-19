@@ -107,6 +107,9 @@ module.exports = function(app) {
                     responseObject.type = "messages";                    
                     responseObject.messages = items;
                     response.send(responseObject);
+                    console.log("Response we're sending")
+                    console.log(responseObject);
+                    console.log(responseObject.messages.length)
                 });
             });
         });
