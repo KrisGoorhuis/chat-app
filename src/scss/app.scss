@@ -23,6 +23,7 @@ $app-height: 600px;
 
 .name {
     cursor: pointer;
+    display: inline-block;
     &:hover {
         color: darkcyan;
     }
@@ -86,7 +87,7 @@ $app-height: 600px;
     flex-direction: column;
     justify-content: space-between;
     max-height: 100%;
-    
+    background-image: url(../assets/filigree_character_by_fractaldesire-datiozd.jpg);
 
     #conversation-tabs-container {
         height: 35px;
@@ -97,10 +98,13 @@ $app-height: 600px;
         overflow-y: hidden;
         margin-bottom: 10px;
         .active {
-            background-color: palegoldenrod;
+            background-color: rgba(212, 147, 57, 0.5);
+            // background-color: rgba(128, 58, 13, 0.5);
+            // background-color: rgba(200, 149, 85, 0.5);
+            // background-color: palegoldenrod;
         }
         .inactive {
-            background-color: lightgray;
+            background-color: rgba(0,0,0,.1);
         }
         .newMessageAlert {
             color: orangered;
@@ -150,14 +154,30 @@ $app-height: 600px;
     	overflow-y: auto;
         overflow-x: hidden;
         max-height: 530px;
+        #chat-log {
+            width: 100%;
+            .message-container {
+                display: inline-block;
+                background-color: rgba(255, 255, 255, 0.7);
+                padding: 5px;
+                margin-bottom: 3px;
+                border-radius: 5px;
+            }
+        }
     }
 
     form {
-        width: 90%;
+        width: 100%;
     }
     #chat-input {
-        margin-left: 10px;
+        padding: 10px;
+        padding-left: 40px;
         width: 100%;
+        opacity: 0.9;
+
+    }
+    #chat-input:focus {
+        outline: none;
     }
 }
 

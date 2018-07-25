@@ -106,7 +106,9 @@ export class ChatLog extends React.Component {
                                     onDoubleClick={ () => {this.props.openConversationTab(obj.author, true)} }
                                     key={obj.timestamp}
                                 >
-                                    {this.pareTimestamp(obj.timestamp)} - <span className="name">{obj.author}</span>: {obj.message}
+                                    <div class="message-container">
+                                        {this.pareTimestamp(obj.timestamp)} -- <span className="name">{obj.author}</span>: {obj.message}
+                                    </div>
                                 </div>
                             })
                         }    
@@ -118,7 +120,9 @@ export class ChatLog extends React.Component {
                                 if (currentChatWindow === obj.recipient || obj.author) {
                                     // obj.map( (message, index) => {
                                         return <div key={index}>
-                                            {this.pareTimestamp(obj.timestamp)} - <span className="name">{currentChatWindow === currentUser ? "You" : obj.author}</span>: {obj.message}
+                                            <div class="message-container">
+                                                {this.pareTimestamp(obj.timestamp)} -- <span className="name">{currentChatWindow === currentUser ? "You" : obj.author}</span>: {obj.message}
+                                            </div>
                                         </div>
                                     // })
                                 }

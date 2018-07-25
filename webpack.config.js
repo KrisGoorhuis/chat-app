@@ -25,13 +25,26 @@ module.exports = {
 				test: /.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
 				use: [{
 				  loader: 'file-loader',
-				  options: {
-					name: '[name].[ext]',
-					outputPath: 'fonts/',    // where the fonts will go
-					publicPath: '../'       // override the default path
+						options: {
+						name: '[name].[ext]',
+						outputPath: 'fonts/',    // where the fonts will go
+						publicPath: '../'       // override the default path
 				  }
 				}]
-			  }
+			},
+			{
+				test: /\.(gif|png|jpe?g|svg)$/i,
+				use: [
+					'file-loader',
+					{
+						loader: 'image-webpack-loader',
+						options: {
+							bypassOnDebug: true, // webpack@1.x
+							disable: true, // webpack@2.x and newer
+						},
+					}
+				]
+			}
 		]
 	},
 	plugins: [
