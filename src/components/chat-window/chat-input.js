@@ -4,27 +4,25 @@ import PropTypes from 'prop-types';
 
 // Child of chat-window-main.js
 export class ChatInput extends React.Component {
+
     constructor(props) {
-        super(props);
-        
+        super(props);      
         this.ws = this.props.ws; 
-        console.log(this.ws);  
     }
 
     submitMessage(element) {
         element.preventDefault(); // Prevents page from refreshing on submit.
-        let sendingPublicMessage = true;
         
         // Public messages
         if (this.props.currentChatWindow === "public") {
             this.ws.send(JSON.stringify(
-                    {
-                        "conversationType": "public",
-                        "author": this.props.currentUser,
-                        "timestamp": new Date(),
-                        "message": this.chatInputElement.value,
-                    }
-                ));   
+                {
+                    "conversationType": "public",
+                    "author": this.props.currentUser,
+                    "timestamp": new Date(),
+                    "message": this.chatInputElement.value,
+                }
+            ));   
                 
         // Private message
         } else { 
@@ -44,7 +42,6 @@ export class ChatInput extends React.Component {
     }
 
     render() {
-
         return (
             <form onSubmit={ (element) => this.submitMessage(element) }>
                 <input 

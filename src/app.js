@@ -40,9 +40,13 @@ export class App extends React.Component {
                 });
             });
 
+
+        // onopen does:
+        // Get our message history - private and public
+        // Check to see if the user has a name. Retrieve an unused one from the back if not.
+        // Start pinging to keep the socket open
         this.ws.onopen = () => {
-             // Keeps the socket open and keeps us on the active user list.
-            //  TODO: We don't seem to be coming here after registering a new user. Most of the time we make it?
+             // Keeps the socket open and keeps us on the active user list.            //  TODO: We don't seem to be coming here after registering a new user. Most of the time we make it?
             let sendPing = () => {
                 if (this.ws.readyState === this.ws.CLOSED) {
                     console.log("Websocket closed. Ending pings")
@@ -57,7 +61,7 @@ export class App extends React.Component {
                 }, 5000);
             };
             
-            // Get all conversations that have
+            
             // Returns an object containing the conversations as items.
             let getPrivateConversationsHistory = (userName) => {
                 fetch('/getPrivateConversationsHistory',
@@ -139,7 +143,9 @@ export class App extends React.Component {
             
     }
 
-        
+        // onmessage does:
+        // Keep our user list and message scroll up to date - private and public.
+        // See if we need to alert the user to something new.
         this.ws.onmessage = (message) => {
             let parsedMessage = JSON.parse(message.data)
             
@@ -151,10 +157,10 @@ export class App extends React.Component {
             }
 
             // Public message
-            // Flag for alert
             if (parsedMessage.type === "message" && parsedMessage.newMessage.conversationType === "public") {
                 let newMessages = this.state.messages;
-
+                
+                // Flag for alert
                 if (this.state.currentChatWindow !== "public") {
                     newMessages.push(parsedMessage.newMessage);
         
@@ -202,7 +208,6 @@ export class App extends React.Component {
                     }
                 }
 
-                
 
                 // Determining whether to alert the user to a new message
                 if (this.state.currentChatWindow !== messageAuthor) {
@@ -232,9 +237,9 @@ export class App extends React.Component {
 
     openConversationTab(partnerName, flipTo) {
         // TODO: I tried to save some operations by watching what changed here
-        // But variable updates defined lower in the code were occurring before the initial log just below this.
-        // BUT - this odd behavior only occurred in normal execution - stepping through in the debugger saw things behaving as expected.
-        // Something something different Javascript engines, the debugger version functioning as expected. 
+        // But variable updates defined lower in the code were occurring before the initial commented out log just below this.
+        // BUT - this odd behavior only occurred in normal execution in the browser -
+        //  - stepping through in the debugger saw things behaving as expected.
         // Instead of digging into that - maybe later - I'm just going to let it do the unnecessary steps.
 
         // Basically: Chrome's Javascript engine !== Chrome's debugger's Javascript engine
@@ -266,7 +271,6 @@ export class App extends React.Component {
         if (newSideList !== this.state.privateConversationsSideList || newTopTabs !== this.state.conversationTabs) {
             updateState = true;
         }
-        console.log(newTopTabs);
         // debugger;
         // if (updateState === true && flipTo === true) {
         //     console.log("firsy blah")
@@ -356,12 +360,8 @@ export class App extends React.Component {
             })
         }
         
-
     }
    
-    componentDidUpdate() {
-
-    }
 
     render() {
         return (

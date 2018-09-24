@@ -91,6 +91,7 @@ export class ChatLog extends React.Component {
                     }
                 </div>
                 <div id="container-chat-log">
+                
                     {/* Body of text for the selected tab */}
                     <div id="chat-log" ref="chatLog">
                         {
@@ -106,7 +107,7 @@ export class ChatLog extends React.Component {
                                     onDoubleClick={ () => {this.props.openConversationTab(obj.author, true)} }
                                     key={obj.timestamp}
                                 >
-                                    <div class="message-container">
+                                    <div className="message-container">
                                         {this.pareTimestamp(obj.timestamp)} -- <span className="name">{obj.author}</span>: {obj.message}
                                     </div>
                                 </div>
